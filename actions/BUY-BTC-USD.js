@@ -1,8 +1,8 @@
 ((actionMachine, { stateMachine }) => {
   const { setState, getState } = stateMachine;
-  const { addToActionQueue } = actionMachine;
 
   module.exports = (params, done) => {
+    const { addToActionQueue } = actionMachine;
     try {
       // buy and then save the purchase
       let purchase = {};

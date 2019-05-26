@@ -1,16 +1,26 @@
 ((actionMachine, { stateMachine }) => {
   const { getState, setState } = stateMachine;
-  const { setReadyToStart } = actionMachine;
 
   module.exports = (params, done) => {
+    const { setReadyToStart } = actionMachine;
     console.log(' INITIALIZING DATA SET '.bgWhite.blue);
     // grab full dataset (second in every year's price)
     // store in stateMachine
 
     // put in setState('BTC-USD-PRICES-YEAR', btcUsdPricesArray)
-    //
+    // set the intial avgs
 
     setTimeout(() => {
+      setState('BTC-USD-PRICES-YEAR', [1,2,3,4,5]);
+      const averages = {
+        oneHrAvg: '',
+        thirtyMinAvg: '',
+        fiveMinAvg: '',
+        oneMinAvg: '',
+        thirtySecondAvg: '',
+        lastFiveAvg: ''
+      };
+      setState('CURRENT-BTC-USD-AVERAGES', averages);
       console.log(' DATA SET IS HYRDRATED - STARTING LOOP '.bgWhite.blue);
       actionMachine.setReadyToStart();
       done();

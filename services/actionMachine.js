@@ -2,8 +2,6 @@
   let actionQueue = {};
   let readyToStart = false;
 
-  console.log('BINDING'.red);
-
   actionMachine.readyToStart = () => readyToStart;
 
   actionMachine.setReadyToStart = () => {
@@ -81,8 +79,6 @@
       console.log(`${'services'.yellow}/actionMachine.js - ${'removeFromActionQueue'.cyan} - ${queueName} does not exist`);
     }
   };
-
-  console.log('FULLY BOUND'.blue, actionMachine);
 
 })(
   module.exports,

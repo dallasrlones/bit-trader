@@ -1,14 +1,14 @@
 ((actionMachine, { stateMachine }) => {
+  const { getState, setState } = stateMachine;
 
   module.exports = (params, done) => {
-    const { getState, setState } = stateMachine;
     const { addToActionQueue } = actionMachine;
-
     try {
 
       done();
     } catch (err) {
       console.log(`${'actions'.green}/CHECK-FOR-PROFIT-LOSS.js - ${err.toString().red}`);
+      console.log(err);
     }
   };
 

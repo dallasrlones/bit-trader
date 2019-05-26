@@ -7,5 +7,6 @@
 })
 (
   require('../services/actionMachine'),
-  require('../services')
+  require('../services'),
+  require('colors')
 );

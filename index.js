@@ -7,6 +7,8 @@
   const checkForProfitLoopIntervalSpeed = 100;
   const defaultRetrySpeed = 1000;
 
+  // if its every second then consider waiting to start at an even second so that it
+  // can be syncd with real time aka 10:00:00 seconds or the next even seconds from now
   function fetchDataLoop () {
     if (readyToStart() === false) {
       runActionQueue('FETCH-PRICES');

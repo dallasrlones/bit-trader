@@ -1,8 +1,8 @@
 ((actionMachine, { stateMachine }) => {
   const { getState, setState } = stateMachine;
-  const { addToActionQueue } = actionMachine;
 
   module.exports = (params, done) => {
+    const { addToActionQueue } = actionMachine;
     try {
       const currentPrice = getState('CURRENT-BTC-USD-PRICE');
       const currentAvgs = getState('CURRENT-BTC-USD-AVERAGES');
@@ -25,6 +25,7 @@
       done();
     } catch (err) {
       console.log(`${'actions'.green}/CHECK-FOR-SURGE.js - ${err.toString().red}`);
+      console.log(err);
     }
   };
 
