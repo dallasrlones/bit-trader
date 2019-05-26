@@ -7,6 +7,8 @@
   const checkForProfitLoopIntervalSpeed = 250;
   const defaultRetrySpeed = 1000;
 
+  //require('./services/algoMachine').allPossibleAlgos();
+
   // if its every second then consider waiting to start at an even second so that it
   // can be syncd with real time aka 10:00:00 seconds or the next even seconds from now
   function fetchDataLoop () {

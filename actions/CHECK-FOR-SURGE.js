@@ -15,13 +15,11 @@
         lastFiveAvg
       } = currentAvgs;
 
-      //console.log(currentAvgs);
-
       const lastFiveIsSurging = currentPrice >= (lastFiveAvg * 4)
       const lastThirtySecondsIsSurging = currentPrice >= (thirtySecondAvg * 3);
       const oneMinIsSurging = currentPrice >= (oneMinAvg * 2);
-
-      if (lastFiveIsSurging && lastThirtySecondsIsSurging && oneMinIsSurging) {
+      const algo = getState('BTC-USD-ALGO-BUY') || (lastFiveIsSurging && lastThirtySecondsIsSurging && oneMinIsSurging);
+      if (algo) {
         addToActionQueue('PROFIT-CHECK', { name: 'BUY-BTC-USD', params: { currentAvgs, currentPrice } });
       }
       done();
