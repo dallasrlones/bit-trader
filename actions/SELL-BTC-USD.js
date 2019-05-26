@@ -1,7 +1,7 @@
 ((actionMachine, { stateMachine }) => {
 
   module.exports = (params, done) => {
-
+    done();
   };
 
 })
