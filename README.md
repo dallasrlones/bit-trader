@@ -10,7 +10,7 @@
   This is 100% open source between friends, if you make any changes please make a PR
   as so will I.
 
-  When wrings combined we can captain planet this shit.
+  When rings combined we can captain planet this shit.
 
 ## How it all works
 
