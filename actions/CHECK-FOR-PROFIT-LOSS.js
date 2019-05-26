@@ -5,6 +5,10 @@
     const { addToActionQueue } = actionMachine;
     try {
 
+      // grab all orders
+      // loop through each one to see if profitable
+      // if needs to sell add to instant queue
+
       done();
     } catch (err) {
       console.log(`${'actions'.green}/CHECK-FOR-PROFIT-LOSS.js - ${err.toString().red}`);

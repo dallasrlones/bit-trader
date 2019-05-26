@@ -2,8 +2,9 @@
   let actionQueue = {};
   let readyToStart = false;
 
+  // remove from this and use stateMachine
   actionMachine.readyToStart = () => readyToStart;
-
+  // remove from this and use stateMachine
   actionMachine.setReadyToStart = () => {
     readyToStart = true;
   };
@@ -33,7 +34,7 @@
   actionMachine.runActionQueue = queueName => {
     try {
       if (actionQueue[queueName] === undefined) {
-        console.log(`${'services'.yellow}/actionMachine.js - ${'runActionQueue'.cyan} - actionQueue : ${queueName} does not exist`);
+        actionQueue[queueName] = [];
       }
 
       actionQueue[queueName].forEach(actionObj => {
