@@ -4,7 +4,7 @@
 
   let isReady = false;
   const fetchDataLoopIntervalSpeed = 1000;
-  const checkForProfitLoopIntervalSpeed = 100;
+  const checkForProfitLoopIntervalSpeed = 250;
   const defaultRetrySpeed = 1000;
 
   // if its every second then consider waiting to start at an even second so that it
