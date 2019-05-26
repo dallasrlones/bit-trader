@@ -1,9 +1,9 @@
-((coinBaseClient, { apiKey, apiSecret }, { Client }) => {
+((coinBaseClient, { apiKey_CoinBase, apiSecret_CoinBase }, { Client }) => {
 
   const client = () => {
     return new Client({
-      apiKey,
-      apiSecret
+      apiKey: apiKey_CoinBase,
+      apiSecret: apiSecret_CoinBase
     });
   };
 
@@ -12,8 +12,8 @@
   coinBaseClient.fetchCurrentPrice = () => {};
   coinBaseClient.fetchYearsTickData = () => {};
   coinBaseClient.fetchCurrentOrders = () => {};
-  coinBaseClient.buy = () => {};
-  coinBaseClient.sell = () => {};
+  coinBaseClient.buy = ammount => {};
+  coinBaseClient.sell = ammount => {};
 
 })(
   module.exports,

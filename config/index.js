@@ -1,6 +1,6 @@
 ((config) => {
 
-  config.apiKey = '';
-  config.apiSecret = '';
+  config.apiKey_CoinBase = '';
+  config.apiSecret_CoinBase = '';
 
 })(module.exports);
