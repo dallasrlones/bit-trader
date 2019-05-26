@@ -1,14 +1,22 @@
 ((coinBaseClient, { apiKey, apiSecret }, { Client }) => {
 
-  coinBaseClient.client = () => {
+  const client = () => {
     return new Client({
       apiKey,
       apiSecret
     });
   };
 
+  coinBaseClient.fetchAccountData = () => {};
+  coinBaseClient.fetchAccountBalance = () => {};
+  coinBaseClient.fetchCurrentPrice = () => {};
+  coinBaseClient.fetchYearsTickData = () => {};
+  coinBaseClient.fetchCurrentOrders = () => {};
+  coinBaseClient.buy = () => {};
+  coinBaseClient.sell = () => {};
+
 })(
   module.exports,
-  require('../config'),
+  require('../../config'),
   require('coinbase')
 );
