@@ -1,4 +1,4 @@
-((actionMachine, { stateMachine, coinBaseClient }) => {
+((actionMachine, { stateMachine }) => {
 
   module.exports = (params, done) => {
 

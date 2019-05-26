@@ -1,4 +1,4 @@
-((actionMachine, { stateMachine, coinBaseClient }) => {
+((actionMachine, { stateMachine }) => {
   const { getState, setState } = stateMachine;
 
   module.exports = (params, done) => {
