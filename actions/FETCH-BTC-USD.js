@@ -6,7 +6,10 @@
     // set currentAvgs
     try {
       // fetch current price from coinBaseClient
-      const currentPrice = 1.0;
+      function getRandomInt(max) {
+        return Math.floor(Math.random() * Math.floor(max));
+      }
+      const currentPrice = getRandomInt(10);
       setState('CURRENT-BTC-USD-PRICE', currentPrice);
 
       const pushedAndPoppedPrices = getState('BTC-USD-PRICES-YEAR');

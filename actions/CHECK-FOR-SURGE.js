@@ -15,6 +15,8 @@
         lastFiveAvg
       } = currentAvgs;
 
+      //console.log(currentAvgs);
+
       const lastFiveIsSurging = currentPrice >= (lastFiveAvg * 4)
       const lastThirtySecondsIsSurging = currentPrice >= (thirtySecondAvg * 3);
       const oneMinIsSurging = currentPrice >= (oneMinAvg * 2);

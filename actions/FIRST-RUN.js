@@ -11,7 +11,7 @@
     // set the intial avgs
 
     setTimeout(() => {
-      setState('BTC-USD-PRICES-YEAR', [1,2,3,4,5]);
+      setState('BTC-USD-PRICES-YEAR', new Array(60 * 60 * 24 * 366));
       const averages = {
         oneHrAvg: '',
         thirtyMinAvg: '',
