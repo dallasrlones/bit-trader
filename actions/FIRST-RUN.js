@@ -1,5 +1,6 @@
-((actionMachine, { stateMachine }) => {
+(({ actionMachine, stateMachine, traderMachine }) => {
   const { getState, setState } = stateMachine;
+  const { fetchYearsTickData } = traderMachine;
 
   module.exports = (params, done) => {
     const { setReadyToStart } = actionMachine;
@@ -10,25 +11,20 @@
     // put in setState('BTC-USD-PRICES-YEAR', btcUsdPricesArray)
     // set the intial avgs
 
-    setTimeout(() => {
-      setState('BTC-USD-PRICES-YEAR', new Array(60 * 60 * 24 * 366));
-      const averages = {
-        oneHrAvg: '',
-        thirtyMinAvg: '',
-        fiveMinAvg: '',
-        oneMinAvg: '',
-        thirtySecondAvg: '',
-        lastFiveAvg: ''
-      };
+    fetchYearsTickData('COIN-BASE').then(response => {
+      setState('BTC-USD-PRICES-YEAR', response);
+      const averages = {};
       setState('CURRENT-BTC-USD-AVERAGES', averages);
       console.log(' DATA SET IS HYRDRATED - STARTING LOOP '.bgWhite.blue);
       actionMachine.setReadyToStart();
       done();
-    }, 2000)
+    }).catch(err => {
+      console.log(`${'actions'.green}/FIRST-RUN.js - ${err.toString().red}`);
+      console.log(err);
+    });
   };
 
 })(
-  require('../services/actionMachine'),
   require('../services'),
   require('colors')
 );
