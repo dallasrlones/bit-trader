@@ -20,9 +20,9 @@
     return apiBank[apiName].fetchAccountBalance();
   };
 
-  traderMachine.fetchCurrentPrice = apiName => {
+  traderMachine.fetchCurrentBuyPrice = apiName => {
     checkExistsInAPIBank(apiName);
-    return apiBank[apiName].fetchCurrentPrice();
+    return apiBank[apiName].fetchCurrentBuyPrice();
   };
 
   traderMachine.fetchCurrentOrders = apiName => {

@@ -30,3 +30,5 @@
 
   Get rid of the shitty npm module and just use axios
   that thing has tons of security issues
+
+  Fuck coinbase use OANDA

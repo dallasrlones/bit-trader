@@ -1,6 +1,6 @@
 (({ actionMachine, stateMachine, traderMachine, utils }) => {
   const { getState, setState } = stateMachine;
-  const { fetchCurrentPrice } = traderMachine;
+  const { fetchCurrentBuyPrice } = traderMachine;
   const { actionsError } = utils;
 
   function handleError(err) {
@@ -11,7 +11,7 @@
     const { addToActionQueue } = actionMachine;
 
     try {
-      fetchCurrentPrice('COIN-BASE-BTC')
+      fetchCurrentBuyPrice('COIN-BASE-BTC')
         .then((currentPrice) => {
           setState('CURRENT-BTC-USD-PRICE', currentPrice);
 

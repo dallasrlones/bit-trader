@@ -43,7 +43,7 @@
     });
   };
 
-  coinBaseClient.fetchCurrentPrice = () => {
+  coinBaseClient.fetchCurrentBuyPrice = () => {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         resolve(1);
@@ -96,5 +96,5 @@
 })(
   module.exports,
   require('../../config'),
-  require('coinbase')
+  {}
 );
