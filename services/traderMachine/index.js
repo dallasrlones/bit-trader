@@ -1,7 +1,8 @@
 ((traderMachine) => {
 
   const apiBank = {
-    'COIN-BASE-BTC': require('./coinBaseClient')
+    'COIN-BASE-BTC': require('./coinBaseClient'),
+    'OANDA-BTC': require('./oandaClient')
   };
 
   function checkExistsInAPIBank(apiName) {
@@ -23,6 +24,11 @@
   traderMachine.fetchCurrentBuyPrice = apiName => {
     checkExistsInAPIBank(apiName);
     return apiBank[apiName].fetchCurrentBuyPrice();
+  };
+
+  traderMachine.fetchCurrentSellPrice = apiName => {
+    checkExistsInAPIBank(apiName);
+    return apiBank[apiName].fetchCurrentSellPrice();
   };
 
   traderMachine.fetchCurrentOrders = apiName => {
