@@ -25,3 +25,8 @@
 
   We are limited to 2.6 API calls in a single second, thus every 1 second a
   fetch will be made to get the most recent pricing
+
+## TO-DO
+
+  Get rid of the shitty npm module and just use axios
+  that thing has tons of security issues
