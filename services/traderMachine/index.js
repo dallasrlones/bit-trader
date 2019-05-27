@@ -1,7 +1,7 @@
 ((traderMachine) => {
 
   const apiBank = {
-    'COIN-BASE': require('./coinBaseClient')
+    'COIN-BASE-BTC': require('./coinBaseClient')
   };
 
   function checkExistsInAPIBank(apiName) {

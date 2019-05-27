@@ -10,11 +10,12 @@
   module.exports = (params, done) => {
 
     try {
+      const currentBTCBalance = getState('CURRENT-BTC-BALANCE');
 
-      // get current balance of btc
-
-      sell('COIN-BASE', currentBTCBalance)
-        .then()
+      sell('COIN-BASE-BTC', currentBTCBalance)
+        .then((transaction) => {
+          // save transaction to DB
+        })
         .catch(handleError)
 
     } catch (err) {

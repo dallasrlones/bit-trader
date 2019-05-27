@@ -26,7 +26,7 @@
   coinBaseClient.fetchCurrentPrice = () => {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
-        resolve('current price dater potater');
+        resolve(1);
       }, 2000)
     });
   };

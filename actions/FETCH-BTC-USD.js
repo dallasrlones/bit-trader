@@ -11,7 +11,7 @@
     const { addToActionQueue } = actionMachine;
 
     try {
-      fetchCurrentPrice('COIN-BASE')
+      fetchCurrentPrice('COIN-BASE-BTC')
         .then((currentPrice) => {
           setState('CURRENT-BTC-USD-PRICE', currentPrice);
 

@@ -1,8 +1,14 @@
-(({ actionMachine, stateMachine }) => {
+(({ actionMachine, stateMachine, utils }) => {
   const { getState, setState } = stateMachine;
+  const { actionsError } = utils;
+
+  function handleError(err) {
+    actionsError('CHECK-FOR-SURGE', err);
+  }
 
   module.exports = (params, done) => {
     const { addToActionQueue } = actionMachine;
+
     try {
       const currentPrice = getState('CURRENT-BTC-USD-PRICE');
       const currentAvgs = getState('CURRENT-BTC-USD-AVERAGES');
@@ -24,11 +30,12 @@
       if (algo) {
         addToActionQueue('INSTANT', { name: 'BUY-BTC-USD', params: { currentAvgs, currentPrice } });
       }
+
       done();
     } catch (err) {
-      console.log(`${'actions'.green}/CHECK-FOR-SURGE.js - ${err.toString().red}`);
-      console.log(err);
+      handleError(err);
     }
+
   };
 
 })

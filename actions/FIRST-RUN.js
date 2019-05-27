@@ -17,18 +17,18 @@
     friendlyAlert(' INITIALIZING DATA SET ');
 
     // FETCH CURRENT ORDERS
-    fetchCurrentOrders('COIN-BASE')
+    fetchCurrentOrders('COIN-BASE-BTC')
       .then((currentOrdersArray) => {
         setState('COIN-BASE-CURRENT-ORDERS-BTC-USD', currentOrdersArray);
 
         // FETCH CURRENT ACCOUNT BALANCE
-        fetchAccountBalance('COIN-BASE')
+        fetchAccountBalance('COIN-BASE-BTC')
           .then((currentBalance) => {
             // currentBalance will be { usdBalance, btcBalance }
             setState('COIN-BASE-CURRENT-BALANCE-BTC-USD', currentBalance);
 
             // FETCH YEARS WORTH OF DATA IN SECONDS
-            fetchYearsTickData('COIN-BASE')
+            fetchYearsTickData('COIN-BASE-BTC')
               .then(fullYearsTicksInSeconds => {
                 setState('BTC-USD-PRICES-YEAR', fullYearsTicksInSeconds);
 

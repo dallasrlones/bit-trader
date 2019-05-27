@@ -13,7 +13,7 @@
     try {
       const availableBalance = getState();
 
-      buy('COIN-BASE', availableBalance)
+      buy('COIN-BASE-BTC', availableBalance)
         .then((orderReciept) => {
           // add to orderReciepts in DB
           done();

@@ -1,5 +1,10 @@
-(({ actionMachine, stateMachine }) => {
+(({ actionMachine, stateMachine, traderMachine, utils }) => {
   const { getState, setState } = stateMachine;
+  const { actionsError } = utils;
+
+  function handleError(err) {
+    actionsError('CHECK-FOR-PROFIT-LOSS', err);
+  }
 
   module.exports = (params, done) => {
     const { addToActionQueue } = actionMachine;
@@ -11,8 +16,7 @@
 
       done();
     } catch (err) {
-      console.log(`${'actions'.green}/CHECK-FOR-PROFIT-LOSS.js - ${err.toString().red}`);
-      console.log(err);
+      handleError(err);
     }
   };
 
