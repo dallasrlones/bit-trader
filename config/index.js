@@ -1,13 +1,10 @@
-((config) => {
+((config, fs) => {
 
-  config.apiKey_CoinBase = '';
-  config.apiSecret_CoinBase = '';
+  const env = JSON.parse(fs.readFileSync(`${process.cwd()}/env.json`).toString());
 
   config.baseOandaUrl = 'https://api-fxpractice.oanda.com';
   // DO NOT UNCOMMENT UNTIL YOU ARE COMFORTABLE ITS READY FOR LIVE
   // config.baseOandaUrl = 'https://api-fxtrade.oanda.com/v3';
-  config.apiKey_Oanda = '';
-  config.apiSecret_Oanda = '';
-  config.oandaAuthHeader = '';
+  config.oandaAuthHeader = `Bearer ${env['OANDA-KEY']}`;
 
-})(module.exports);
+})(module.exports, require('fs'));

@@ -1,5 +1,11 @@
 # bit-trader
 
+## SETUP
+
+  To setup the system you need to create a file called env.json in the root folder (where package.json lives)
+
+  An example env.json file is located in the examples folder
+
 ## RULES
 
   The first rule of bit_trader, is don't talk about bit_trader :P
@@ -26,5 +32,3 @@
   We are limited to 120 API calls in a single second
 
 ## TO-DO
-
-  

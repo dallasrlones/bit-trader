@@ -1,10 +1,11 @@
 ((oandaClient, axios, { baseOandaUrl, oandaAuthHeader }) => {
 
   const client = axios.create({
-    baseURL: baseOandaUrl,
+    baseURL: `${baseOandaUrl}/v3`,
     timeout: 2000,
     headers: {
-      Authorizaiton: oandaAuthHeader
+      'Authorization': oandaAuthHeader,
+      'Content-Type': 'application/json'
     }
   });
 
@@ -17,7 +18,7 @@
     reject(err);
   }
 
-  oandaClient.fetchAccountIDs = () => {
+  oandaClient.fetchAccountIds = () => {
     return new Promise((resolve, reject) => {
       client.get('/accounts')
         .then(({ data }) => {
@@ -29,7 +30,7 @@
     });
   };
 
-  oandaClient.fetchAccount = accountId => {
+  oandaClient.fetchAccountById = accountId => {
     return new Promise((resolve, reject) => {
       client.get(`/accounts/${accountId}`)
         .then(({ data }) => {
