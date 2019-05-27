@@ -1,4 +1,4 @@
-((actionMachine, { stateMachine }) => {
+(({ actionMachine, stateMachine }) => {
   const { getState, setState } = stateMachine;
 
   module.exports = (params, done) => {
@@ -31,7 +31,6 @@
 
 })
 (
-  require('../services/actionMachine'),
   require('../services'),
   require('colors')
 );

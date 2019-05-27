@@ -5,11 +5,6 @@
   module.exports = (params, done) => {
     const { setReadyToStart } = actionMachine;
     console.log(' INITIALIZING DATA SET '.bgWhite.blue);
-    // grab full dataset (second in every year's price)
-    // store in stateMachine
-
-    // put in setState('BTC-USD-PRICES-YEAR', btcUsdPricesArray)
-    // set the intial avgs
 
     fetchYearsTickData('COIN-BASE').then(response => {
       setState('BTC-USD-PRICES-YEAR', response);
