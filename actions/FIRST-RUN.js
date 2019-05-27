@@ -1,31 +1,54 @@
 (({ actionMachine, stateMachine, traderMachine, utils }) => {
   const { getState, setState } = stateMachine;
-  const { fetchYearsTickData } = traderMachine;
-  const { generateAverages } = utils;
+  const {
+    fetchCurrentOrders,
+    fetchAccountBalance,
+    fetchYearsTickData
+  } = traderMachine;
+  const { friendlyAlert, actionsError, generateAverages } = utils;
 
   function handleError (err) {
-    console.log(`${'actions'.green}/FIRST-RUN.js - ${err.toString().red}`);
-    console.log(err);
+    actionsError('FIRST-RUN', err);
   }
 
   module.exports = (params, done) => {
     const { setReadyToStart } = actionMachine;
-    console.log(' INITIALIZING DATA SET '.bgWhite.blue);
 
-    fetchYearsTickData('COIN-BASE').then(fullYearsTicksInSeconds => {
-      setState('BTC-USD-PRICES-YEAR', fullYearsTicksInSeconds);
+    friendlyAlert(' INITIALIZING DATA SET ');
 
-      const averages = generateAverages(fullYearsTicksInSeconds);
-      setState('CURRENT-BTC-USD-AVERAGES', averages);
+    // FETCH CURRENT ORDERS
+    fetchCurrentOrders('COIN-BASE')
+      .then((currentOrdersArray) => {
+        setState('COIN-BASE-CURRENT-ORDERS-BTC-USD', currentOrdersArray);
 
-      console.log(' DATA SET IS HYRDRATED - STARTING LOOP '.bgWhite.blue);
+        // FETCH CURRENT ACCOUNT BALANCE
+        fetchAccountBalance('COIN-BASE')
+          .then((currentBalance) => {
+            // currentBalance will be { usdBalance, btcBalance }
+            setState('COIN-BASE-CURRENT-BALANCE-BTC-USD', currentBalance);
 
-      actionMachine.setReadyToStart();
-      done();
-    }).catch(handleError);
+            // FETCH YEARS WORTH OF DATA IN SECONDS
+            fetchYearsTickData('COIN-BASE')
+              .then(fullYearsTicksInSeconds => {
+                setState('BTC-USD-PRICES-YEAR', fullYearsTicksInSeconds);
+
+                const averages = generateAverages(fullYearsTicksInSeconds);
+                setState('CURRENT-BTC-USD-AVERAGES', averages);
+
+                friendlyAlert(' DATA SET IS HYRDRATED - STARTING LOOP ');
+
+                actionMachine.setReadyToStart();
+                done();
+
+              }).catch(handleError);
+
+          })
+          .catch(handleError);
+
+      })
+      .catch(handleError);
   };
 
 })(
-  require('../services'),
-  require('colors')
+  require('../services')
 );

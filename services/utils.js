@@ -1,5 +1,14 @@
 ((utils) => {
 
+  utils.friendlyAlert = message => {
+    console.log(message.toString().bgWhite.blue);
+  };
+
+  utils.actionsError = (err, actionName) => {
+    console.log(`${'actions'.green}/${actionName}.js - ${err.toString().red}`);
+    console.log(err);
+  }
+
   utils.getAverage = arr => arr.reduce( ( p, c ) => parseFloat(p) + parseFloat(c), 0 ) / arr.length;
 
   utils.generateAverages = (fullYearsTicksInSeconds) => ({
@@ -20,4 +29,4 @@
     lastFiveAvg: utils.getAverage(fullYearsTicksInSeconds.slice(0, 5)),
   });
 
-})(module.exports);
+})(module.exports, require('colors'));

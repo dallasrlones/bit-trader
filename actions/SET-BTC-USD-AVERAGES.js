@@ -8,8 +8,8 @@
 
       const averages = generateAverages(fullYearsTicksInSeconds);
 
-      console.log('setting avgs'.bgWhite.blue, fullYearsTicksInSeconds.length);
-      console.log(averages);
+      // console.log('setting avgs'.bgWhite.blue, fullYearsTicksInSeconds.length);
+      // console.log(averages);
       setState('CURRENT-BTC-USD-AVERAGES', averages);
 
       done();

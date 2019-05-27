@@ -1,20 +1,31 @@
-(({ actionMachine, stateMachine }) => {
+(({ actionMachine, stateMachine, traderMachine, utils }) => {
   const { setState, getState } = stateMachine;
+  const { buy } = traderMachine;
+  const { actionsError } = utils;
+
+  function handleError(err){
+    actionsError('BUY-BTC-USD', err);
+  }
 
   module.exports = (params, done) => {
     const { addToActionQueue } = actionMachine;
+
     try {
-      // buy and then save the purchase
-      let purchase = {};
-      //addToActionQueue('PROFIT-CHECK', { name: 'SAVE-PURCHACE-BTC-USD', params: { purchase } });
-      done();
+      const availableBalance = getState();
+
+      buy('COIN-BASE', availableBalance)
+        .then((orderReciept) => {
+          // add to orderReciepts in DB
+          done();
+        })
+        .catch(handleError);
+
     } catch (err) {
-      console.log(`${'actions'.green}/BUY-BTC-USD.js - ${err.toString().red}`);
+      handleError(err);
     }
   };
 
 })
 (
-  require('../services'),
-  require('colors')
+  require('../services')
 );

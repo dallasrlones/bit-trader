@@ -1,33 +1,37 @@
-(({ actionMachine, stateMachine }) => {
+(({ actionMachine, stateMachine, traderMachine, utils }) => {
   const { getState, setState } = stateMachine;
+  const { fetchCurrentPrice } = traderMachine;
+  const { actionsError } = utils;
+
+  function handleError(err) {
+    actionsError('FETCH-BTC-USD', err);
+  }
 
   module.exports = (params, done) => {
     const { addToActionQueue } = actionMachine;
-    // set currentAvgs
+
     try {
-      // fetch current price from coinBaseClient
-      function getRandomInt(max) {
-        return Math.floor(Math.random() * Math.floor(max));
-      }
-      const currentPrice = getRandomInt(10);
-      setState('CURRENT-BTC-USD-PRICE', currentPrice);
+      fetchCurrentPrice('COIN-BASE')
+        .then((currentPrice) => {
+          setState('CURRENT-BTC-USD-PRICE', currentPrice);
 
-      const pushedAndPoppedPrices = getState('BTC-USD-PRICES-YEAR');
-      pushedAndPoppedPrices.unshift(currentPrice);
-      pushedAndPoppedPrices.pop();
+          const pushedAndPoppedPrices = getState('BTC-USD-PRICES-YEAR');
+          pushedAndPoppedPrices.unshift(currentPrice);
+          pushedAndPoppedPrices.pop();
 
-      setState('BTC-USD-PRICES-YEAR', pushedAndPoppedPrices);
-      addToActionQueue('FETCH-PRICES', { name: 'SET-BTC-USD-AVERAGES' });
+          setState('BTC-USD-PRICES-YEAR', pushedAndPoppedPrices);
+          addToActionQueue('INSTANT', { name: 'SET-BTC-USD-AVERAGES' });
 
-      done();
+          done();
+        })
+        .catch(handleError);
+
     } catch (err) {
-      console.log(`${'actions'.green}/CHECK-FOR-PROFIT-LOSS.js - ${err.toString().red}`);
-      console.log(err);
+      handleError(err);
     }
   };
 
 })
 (
-  require('../services'),
-  require('colors')
+  require('../services')
 );

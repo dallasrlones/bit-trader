@@ -7,9 +7,30 @@
     });
   };
 
-  coinBaseClient.fetchAccountData = () => {};
-  coinBaseClient.fetchAccountBalance = () => {};
-  coinBaseClient.fetchCurrentPrice = () => {};
+  coinBaseClient.fetchAccountData = () => {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve('account dater potater');
+      }, 2000)
+    });
+  };
+
+  coinBaseClient.fetchAccountBalance = () => {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve('account balance dater potater');
+      }, 2000)
+    });
+  };
+
+  coinBaseClient.fetchCurrentPrice = () => {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve('current price dater potater');
+      }, 2000)
+    });
+  };
+
   coinBaseClient.fetchYearsTickData = () => {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
@@ -17,9 +38,30 @@
       }, 2000)
     });
   };
-  coinBaseClient.fetchCurrentOrders = () => {};
-  coinBaseClient.buy = ammount => {};
-  coinBaseClient.sell = ammount => {};
+
+  coinBaseClient.fetchCurrentOrders = () => {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve(new Array(2));
+      }, 2000)
+    });
+  };
+
+  coinBaseClient.buy = ammount => {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve('purchase order dater potater');
+      }, 2000)
+    });
+  };
+
+  coinBaseClient.sell = ammount => {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve('sell order dater potater');
+      }, 2000)
+    });
+  };
 
 })(
   module.exports,

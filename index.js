@@ -19,6 +19,8 @@
 
   // if its every second then consider waiting to start at an even second so that it
   // can be syncd with real time aka 10:00:00 seconds or the next even seconds from now
+
+  // consider using another account or even API purely for gets and a another for placing orders
   function startTheLoop () {
     if (readyToStart() === false) {
       runActionQueue('FETCH-PRICES');
