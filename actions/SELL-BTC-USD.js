@@ -10,7 +10,7 @@
   module.exports = (params, done) => {
 
     try {
-      const currentBTCBalance = getState('CURRENT-BTC-BALANCE');
+      const { btcBalance, usdBalance } = getState('CURRENT-BTC-BALANCE');
 
       sell('COIN-BASE-BTC', currentBTCBalance)
         .then((transaction) => {

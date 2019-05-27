@@ -11,15 +11,35 @@
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         resolve('account dater potater');
-      }, 2000)
+      }, 200)
     });
   };
 
   coinBaseClient.fetchAccountBalance = () => {
+
+    // const balances = accounts.reduce((results, account) => {
+    //   if (account.currency === 'BTC') {
+    //     results.btcBalance = account.balance;
+    //     results.btcAvailable = account.available;
+    //   }
+    //
+    //   if (account.currency === 'USD') {
+    //     results.usdBalance = account.balance;
+    //     results.usdAvailable = account.available;
+    //   }
+    // });
+    //
+    // resolve(balances);
+
     return new Promise((resolve, reject) => {
       setTimeout(() => {
-        resolve('account balance dater potater');
-      }, 2000)
+        resolve({
+          btcBalance: 1,
+          btcAvailable: 1,
+          usdBalance: 1,
+          usdAvailable: 1
+        });
+      }, 200)
     });
   };
 
@@ -27,7 +47,7 @@
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         resolve(1);
-      }, 2000)
+      }, 200)
     });
   };
 
@@ -35,7 +55,7 @@
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         resolve(new Array(60 * 60 * 24 * 366));
-      }, 2000)
+      }, 200)
     });
   };
 
@@ -43,15 +63,25 @@
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         resolve(new Array(2));
-      }, 2000)
+      }, 200)
     });
   };
 
   coinBaseClient.buy = ammount => {
     return new Promise((resolve, reject) => {
+
+      // {
+      //   // size is the smallest increment to buy in this case 1 penny
+      //   size: '0.01',
+      //   price: ammount,
+      //   side: 'buy',
+      //   product_id: 'BTC-USD'
+      // }
+
+
       setTimeout(() => {
         resolve('purchase order dater potater');
-      }, 2000)
+      }, 200)
     });
   };
 
@@ -59,7 +89,7 @@
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         resolve('sell order dater potater');
-      }, 2000)
+      }, 200)
     });
   };
 

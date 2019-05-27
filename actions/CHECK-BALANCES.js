@@ -10,11 +10,10 @@
     const { addToActionQueue } = actionMachine;
 
     try {
-      const { btcBalance, usdBalance } = getState();
-      const currentOrders = getState();
+      const { btcBalance, usdBalance } = getState('COIN-BASE-CURRENT-BALANCE-BTC-USD');
+      const isProfitable = getState('BTC-USD-IS-PROFITABLE');
 
-      if (usdBalance > 0 && currentOrders.length > 0) {
-        // buy more, because there are trades means that btc is going up
+      if (usdBalance > 0 && isProfitable === true) {
         addToActionQueue('INSTANT', { name: 'BUY-BTC-USD' });
       }
 

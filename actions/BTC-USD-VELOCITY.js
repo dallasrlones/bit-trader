@@ -8,7 +8,7 @@
 
   module.exports = (params, done) => {
     try {
-      const { lastFiveAvg, fiveMinAvg } = getState();
+      const { lastFiveAvg, fiveMinAvg } = getState('CURRENT-BTC-USD-AVERAGES');
       const positiveCheck = lastFiveAvg > fiveMinAvg ? true : false;
 
       setState('BTC-USD-IS-PROFITABLE', positiveCheck);

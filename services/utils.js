@@ -4,7 +4,7 @@
     console.log(message.toString().bgWhite.blue);
   };
 
-  utils.actionsError = (err, actionName) => {
+  utils.actionsError = (actionName, err) => {
     console.log(`${'actions'.green}/${actionName}.js - ${err.toString().red}`);
     console.log(err);
   }

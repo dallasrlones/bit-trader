@@ -1,8 +1,8 @@
-((actionMachine) => {
+((actionMachine, { stateMachine }) => {
   const { runActionQueue, addToActionQueue, readyToStart } = actionMachine;
   addToActionQueue('FETCH-PRICES', { name: 'FIRST-RUN' });
 
-  const startTheLoopIntervalSpeed = 1000;
+  const startLoopsIntervalSpeed = 1000;
   const checkForProfitLoopIntervalSpeed = 250;
   const instantQueueLoopIntervalSpeed = 50;
   const defaultRetrySpeed = 1000;
@@ -10,6 +10,7 @@
   //require('./services/algoMachine').allPossibleAlgos();
 
   function checkForProfitLoop() {
+    // THIS LOOP RUNS EVERY 250 MILLISECONDS
     const checkForProfitLoop = setInterval(() => {
       addToActionQueue('PROFIT-CHECK', { name: 'CHECK-FOR-PROFIT-LOSS' });
       addToActionQueue('PROFIT-CHECK', { name: 'CHECK-FOR-SURGE' });
@@ -21,28 +22,33 @@
   // can be syncd with real time aka 10:00:00 seconds or the next even seconds from now
 
   // consider using another account or even API purely for gets and a another for placing orders
-  function startTheLoop () {
+  function startLoops () {
     if (readyToStart() === false) {
       runActionQueue('FETCH-PRICES');
       setTimeout(() => {
-        return startTheLoop();
-      }, startTheLoopIntervalSpeed);
+        return startLoops();
+      }, startLoopsIntervalSpeed);
     } else {
+      startUpdateLoop();
       checkForProfitLoop();
       let fetchPriceLoop = setInterval(() => {
+        // THIS LOOP RUNS EVERY 1 SECOND
         addToActionQueue('FETCH-PRICES', { name: 'FETCH-BTC-USD' });
+        addToActionQueue('FETCH-PRICES', { name: 'FETCH-BTC-BALANCES' });
         runActionQueue('FETCH-PRICES');
       }, defaultRetrySpeed);
     }
   };
 
   function startUpdateLoop(){
+    // THIS LOOP RUNS EVERY 50 MILLISECONDS
     const instantQueueLoop = setInterval(() => {
+      addToActionQueue('INSTANT', { name: 'BTC-USD-VELOCITY' });
+      addToActionQueue('INSTANT', { name: 'CHECK-BALANCES' });
       runActionQueue('INSTANT');
     }, instantQueueLoopIntervalSpeed);
   }
 
-  startUpdateLoop();
-  startTheLoop();
+  startLoops();
 
-})(require('./services/actionMachine'));
+})(require('./services/actionMachine'), require('./services'));

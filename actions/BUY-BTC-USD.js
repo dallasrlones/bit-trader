@@ -10,6 +10,8 @@
   module.exports = (params, done) => {
     const { addToActionQueue } = actionMachine;
 
+    // set a guard so that you don't make a million of the same buys
+
     try {
       const availableBalance = getState();
 
