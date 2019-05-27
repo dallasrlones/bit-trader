@@ -11,24 +11,20 @@
     actionsError('FIRST-RUN', err);
   }
 
-  module.exports = (params, done) => {
-    const { setReadyToStart } = actionMachine;
-
-    friendlyAlert(' INITIALIZING DATA SET ');
-
+  function oandaLoop(setReadyToStart) {
     // FETCH CURRENT ORDERS
-    fetchCurrentOrders('COIN-BASE-BTC')
+    fetchCurrentOrders('OANDA')
       .then((currentOrdersArray) => {
         setState('COIN-BASE-CURRENT-ORDERS-BTC-USD', currentOrdersArray);
 
         // FETCH CURRENT ACCOUNT BALANCE
-        fetchAccountBalance('COIN-BASE-BTC')
+        fetchAccountBalance('OANDA')
           .then((currentBalance) => {
             // currentBalance will be { usdBalance, btcBalance }
             setState('COIN-BASE-CURRENT-BALANCE-BTC-USD', currentBalance);
 
             // FETCH YEARS WORTH OF DATA IN SECONDS
-            fetchYearsTickData('COIN-BASE-BTC')
+            fetchYearsTickData('OANDA')
               .then(fullYearsTicksInSeconds => {
                 setState('BTC-USD-PRICES-YEAR', fullYearsTicksInSeconds);
 
@@ -47,6 +43,13 @@
 
       })
       .catch(handleError);
+  }
+
+  module.exports = (params, done) => {
+    const { setReadyToStart } = actionMachine;
+
+    friendlyAlert(' INITIALIZING DATA SET ');
+    oandaLoop(setReadyToStart);
   };
 
 })(

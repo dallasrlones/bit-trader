@@ -12,8 +12,10 @@
   function checkForProfitLoop() {
     // THIS LOOP RUNS EVERY 250 MILLISECONDS
     const checkForProfitLoop = setInterval(() => {
+      addToActionQueue('PROFIT-CHECK', { name: 'CHECK-BALANCES' });
       addToActionQueue('PROFIT-CHECK', { name: 'CHECK-FOR-PROFIT-LOSS' });
       addToActionQueue('PROFIT-CHECK', { name: 'CHECK-FOR-SURGE' });
+      addToActionQueue('PROFIT-CHECK', { name: 'BTC-USD-VELOCITY' });
       runActionQueue('PROFIT-CHECK');
     }, checkForProfitLoopIntervalSpeed);
   }
@@ -43,8 +45,6 @@
   function startUpdateLoop(){
     // THIS LOOP RUNS EVERY 50 MILLISECONDS
     const instantQueueLoop = setInterval(() => {
-      addToActionQueue('INSTANT', { name: 'BTC-USD-VELOCITY' });
-      addToActionQueue('INSTANT', { name: 'CHECK-BALANCES' });
       runActionQueue('INSTANT');
     }, instantQueueLoopIntervalSpeed);
   }
