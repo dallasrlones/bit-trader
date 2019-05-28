@@ -11,22 +11,32 @@
 
   utils.getAverage = arr => arr.reduce( ( p, c ) => parseFloat(p) + parseFloat(c), 0 ) / arr.length;
 
-  utils.generateAverages = (fullYearsTicksInSeconds) => ({
-    twentyEightDayAvg: utils.getAverage(fullYearsTicksInSeconds.slice(0, (60 * 60 * 24 * 28))),
-    fifteenDayAvg: utils.getAverage(fullYearsTicksInSeconds.slice(0, (60 * 60 * 24 * 15))),
-    sevenDayAvg: utils.getAverage(fullYearsTicksInSeconds.slice(0, (60 * 60 * 24 * 7))),
-    dayAvg: utils.getAverage(fullYearsTicksInSeconds.slice(0, (60 * 60 * 24))),
-    twelveHrAvg: utils.getAverage(fullYearsTicksInSeconds.slice(0, (60 * 60 * 12))),
-    sixHrAvg: utils.getAverage(fullYearsTicksInSeconds.slice(0, (60 * 60 * 6))),
-    threeHrAvg: utils.getAverage(fullYearsTicksInSeconds.slice(0, (60 * 60 * 3))),
-    twoHrAvg: utils.getAverage(fullYearsTicksInSeconds.slice(0, (60 * 60 * 2))),
-    oneHrAvg: utils.getAverage(fullYearsTicksInSeconds.slice(0, (60 * 60))),
-    thirtyMinAvg: utils.getAverage(fullYearsTicksInSeconds.slice(0, (60 * 30))),
-    fifteenMinAvg: utils.getAverage(fullYearsTicksInSeconds.slice(0, (60 * 15))),
-    fiveMinAvg: utils.getAverage(fullYearsTicksInSeconds.slice(0, (60 * 5))),
-    oneMinAvg: utils.getAverage(fullYearsTicksInSeconds.slice(0, 60)),
-    thirtySecondAvg: utils.getAverage(fullYearsTicksInSeconds.slice(0, 30)),
-    lastFiveAvg: utils.getAverage(fullYearsTicksInSeconds.slice(0, 5)),
-  });
+  utils.getPercentageChanged = (oldNumber, newNumber) => {
+    var decreaseValue = oldNumber - newNumber;
+    return (decreaseValue / oldNumber) * 100;
+  };
+
+  utils.getCandlePercentageChanged = (oldCandle, newCandle) => {
+    return {
+      c: utils.getPercentageChanged(oldCandle.c, newCandle.c),
+      h: utils.getPercentageChanged(oldCandle.h, newCandle.h),
+      l: utils.getPercentageChanged(oldCandle.l, newCandle.l),
+      o: utils.getPercentageChanged(oldCandle.o, newCandle.o)
+    };
+  };
+
+  utils.generateVelocitiesArrayFromCandles = (candlesArray, limit) => {
+    let velocitiesArray = [];
+
+    for (var i in candlesArray) {
+      if (i !== 0) {
+        velocitiesArray.push(
+          utils.getCandlePercentageChanged(candles[i - 1], candles[i])
+        );
+      }
+    }
+
+    return velocitiesArray;
+  };
 
 })(module.exports, require('colors'));

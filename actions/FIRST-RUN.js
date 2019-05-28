@@ -1,62 +1,104 @@
-(({ actionMachine, stateMachine, traderMachine, utils }) => {
+(({ actionMachine, stateMachine, traderMachine, utils }, moment) => {
   const { getState, setState } = stateMachine;
   const {
     fetchAccountIds,
     fetchAccountById,
     fetchCurrentOrders,
-    fetchTickDataFrom
+    fetchTickDataFrom,
+    fetchAvailableInstruments
   } = traderMachine;
-  const { friendlyAlert, actionsError, generateAverages } = utils;
+  const { friendlyAlert, actionsError, generateVelocitiesArrayFromCandles } = utils;
 
   function handleError (err) {
     actionsError('FIRST-RUN', err);
+    process.exit(1)
   }
 
   function oandaLoop(setReadyToStart) {
+    // top 5 surging currency pairs
+    setState('OANDA-TOP-SURGING', []);
+    // { 'USD_BTC': true, ... }
+    setState('OANDA-CURRENCY-IS-PROFITABLE', { });
 
-    // grab accounts
-    // set primary account id in stateMachine
+    // grab accounts ids
     fetchAccountIds('OANDA')
       .then((accountIdsArray) => {
-        console.log(accountIdsArray);
-        process.exit(1);
+
+        accountIdsArray.forEach(({ id }) => {
+          // is primary account, set ID in stateMachine
+          // CHECK TO SEE IF 001 IS YOUR PRIMARY ACCOUNT
+          if (id.slice((id.length - 3), id.length) === '001') {
+            setState('OANDA-ACCOUNT-PRIMARY-ID', id);
+
+            fetchAccountById('OANDA', id)
+              .then((primaryAccount) => {
+                friendlyAlert(' ACCOUNT SYNCED ');
+                // set primary account data in stateMachine
+                setState('OANDA-ACCOUNT-PRIMARY', primaryAccount);
+
+                // console.log(primaryAccount);
+
+                //grab available instruments
+                fetchAvailableInstruments('OANDA', id)
+                  .then((instrumentsArray) => {
+                    friendlyAlert(' INSTRUMENTS SYNCED ');
+                    let count = instrumentsArray.length;
+                    friendlyAlert(` LOOPING THROUGH - ${count} - INSTRUMENTS`);
+                    instrumentsArray.forEach(({ name }) => {
+
+                      // FETCH MONTHS TICK DATA
+                      const secondsInAMonth = (60 * 60 * 24 * 28);
+
+
+                      // loop through seconds in a month / 5000 for all itteration counts
+                      let fetchCount = secondsInAMonth / 5000 / 5;
+
+                      console.log(fetchCount);
+                      process.exit(1)
+
+                      for (var i = 1; i < secondsInAMonth / 5000 / 5; i++) {
+
+                        const dateToStep = moment().subtract(i * 5000, 'seconds').unix();
+
+                        fetchTickDataFrom('OANDA', name, dateToStep, 5000)
+                          .then((candlesArray) => {
+
+                            // if this is too big for ram put in a graph db
+                            // setState(`OANDA-CANDLE-DATA-MONTH-${name}`, candlesArray);
+                            // setState(`OANDA-CANDLE-AVERAGES-${name}`, generateVelocitiesArrayFromCandles(candlesArray));
+
+                            fetchCount -= 1;
+
+                            friendlyAlert(` ITTERATIONS LEFT - ${count} `);
+
+                            if (fetchCount <= 0) {
+                              count -= 1;
+
+                              if (count >= 0) {
+                                friendlyAlert(' DATA SET IS HYRDRATED - STARTING LOOP ');
+                                actionMachine.setReadyToStart();
+                                done();
+                              }
+
+                            }
+                          })
+                          .catch(handleError);
+
+                      }
+
+
+                    });
+
+                  })
+                  .catch(handleError);
+
+              })
+              .catch(handleError);
+          }
+        });
       })
-      .catch((err) => {
-        handleError(err);
-      });
+      .catch(handleError);
 
-
-    // FETCH CURRENT ORDERS
-    // fetchCurrentOrders('OANDA')
-    //   .then((currentOrdersArray) => {
-    //     setState('COIN-BASE-CURRENT-ORDERS-BTC-USD', currentOrdersArray);
-    //
-    //     // FETCH CURRENT ACCOUNT BALANCE
-    //     fetchAccountBalance('OANDA')
-    //       .then((currentBalance) => {
-    //         // currentBalance will be { usdBalance, btcBalance }
-    //         setState('COIN-BASE-CURRENT-BALANCE-BTC-USD', currentBalance);
-    //
-    //         // FETCH YEARS WORTH OF DATA IN SECONDS
-    //         fetchYearsTickData('OANDA')
-    //           .then(fullYearsTicksInSeconds => {
-    //             setState('BTC-USD-PRICES-YEAR', fullYearsTicksInSeconds);
-    //
-    //             const averages = generateAverages(fullYearsTicksInSeconds);
-    //             setState('CURRENT-BTC-USD-AVERAGES', averages);
-    //
-    //             friendlyAlert(' DATA SET IS HYRDRATED - STARTING LOOP ');
-    //
-    //             actionMachine.setReadyToStart();
-    //             done();
-    //
-    //           }).catch(handleError);
-    //
-    //       })
-    //       .catch(handleError);
-    //
-    //   })
-    //   .catch(handleError);
   }
 
   module.exports = (params, done) => {
@@ -67,5 +109,6 @@
   };
 
 })(
-  require('../services')
+  require('../services'),
+  require('moment')
 );

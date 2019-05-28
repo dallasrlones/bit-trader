@@ -20,6 +20,11 @@
     return apiBank[apiName].fetchAccountById(accountId);
   };
 
+  traderMachine.fetchAvailableInstruments = (apiName, accountId) => {
+    checkExistsInAPIBank(apiName);
+    return apiBank[apiName].fetchAvailableInstruments(accountId);
+  };
+
   // traderMachine.fetchAccountBalance = (apiName, accountId) => {
   //   checkExistsInAPIBank(apiName);
   //   return apiBank[apiName].fetchAccountBalance(accountId);
@@ -35,9 +40,9 @@
   //   return apiBank[apiName].fetchCurrentOrders(accountId);
   // };
 
-  traderMachine.fetchTickDataFrom = (apiName, fromDate) => {
+  traderMachine.fetchTickDataFrom = (apiName, currencyPair, fromDate, count) => {
     checkExistsInAPIBank(apiName);
-    return apiBank[apiName].fetchTickDataFrom(fromDate);
+    return apiBank[apiName].fetchTickDataFrom(currencyPair, fromDate, count);
   };
 
   // traderMachine.fetchYearsTickData = apiName => {
@@ -45,14 +50,14 @@
   //   return apiBank[apiName].fetchYearsTickData();
   // };
 
-  traderMachine.buy = (apiName, ammount) => {
+  traderMachine.buy = (apiName, amount) => {
     checkExistsInAPIBank(apiName);
-    return apiBank[apiName].buy(ammount);
+    return apiBank[apiName].buy(amount);
   };
 
-  traderMachine.sell = (apiName, ammount) => {
+  traderMachine.sell = (apiName, amount) => {
     checkExistsInAPIBank(apiName);
-    return apiBank[apiName].sell(ammount);
+    return apiBank[apiName].sell(amount);
   };
 
 })

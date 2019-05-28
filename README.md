@@ -6,6 +6,12 @@
 
   An example env.json file is located in the examples folder
 
+## CODING GUIDE
+
+  All AJAX calls must be made in an Action, then update state using stateMachine getState and setState
+
+  This allows us to put a 150 call limit per second on all of our AJAX calls
+
 ## RULES
 
   The first rule of bit_trader, is don't talk about bit_trader :P
@@ -32,3 +38,11 @@
   We are limited to 120 API calls in a single second
 
 ## TO-DO
+
+  Create AJAX limit machine
+
+  Create candles catch up to last bulk date
+
+  Update candle data set every 5 seconds with new pricing live data
+
+  Possibility: If you can only fetch per S5 (5 seconds) go back 5 times with a second offset to grab all 1S for the month

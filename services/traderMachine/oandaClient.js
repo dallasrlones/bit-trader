@@ -2,14 +2,14 @@
 
   const client = axios.create({
     baseURL: `${baseOandaUrl}/v3`,
-    timeout: 2000,
+    timeout: 30000,
     headers: {
       'Authorization': oandaAuthHeader,
       'Content-Type': 'application/json'
     }
   });
 
-  const granularity = 'S1';
+  const granularity = 'S5';
   const alignmentTimezone = 'America/Denver';
 
   function handleError(methodName, err, reject) {
@@ -22,7 +22,8 @@
     return new Promise((resolve, reject) => {
       client.get('/accounts')
         .then(({ data }) => {
-          resolve(data);
+          const { accounts } = data;
+          resolve(accounts);
         })
         .catch((err) => {
           handleError('fetchAccountIDs', err, reject);
@@ -34,7 +35,8 @@
     return new Promise((resolve, reject) => {
       client.get(`/accounts/${accountId}`)
         .then(({ data }) => {
-          resolve(data);
+          const { account } = data;
+          resolve(account);
         })
         .catch((err) => {
           handleError('fetchAccount', err, reject);
@@ -44,9 +46,23 @@
     // positions contain current trades including profit loss and fees charged
   };
 
+  // gets the instruments you can legally trade with
+  oandaClient.fetchAvailableInstruments = accountId => {
+    return new Promise((resolve, reject) => {
+      client.get(`/accounts/${accountId}/instruments`)
+        .then(({ data }) => {
+          const { instruments } = data;
+          resolve(instruments);
+        })
+        .catch((err) => {
+          handleError('fetchAvailableInstruments', err, reject);
+        });
+    });
+  };
+
   oandaClient.fetchCurrentPricingForInstruments = (accountId, instrumentsArray) => {
     return new Promise((resolve, reject) => {
-      client.get(`/accounts/${oandaAccountId}/pricing`, { params: { instruments: instrumentsArray.join('%2') } })
+      client.get(`/accounts/${accountId}/pricing`, { params: { instruments: instrumentsArray.join('%2') } })
         .then(({ data }) => {
           resolve(data);
         })
@@ -56,7 +72,7 @@
     });
   };
 
-  // use the accounts method for current positions open
+  // use the accounts method for current trades open
   oandaClient.fetchCurrentOrders = accountId => {
     return new Promise((resolve, reject) => {
       client.get(`/accounts/${accountId}/orders`)
@@ -77,11 +93,12 @@
           granularity,
           alignmentTimezone,
           from,
-          count
+          count,
         }
       })
       .then(({ data }) => {
-        resolve(data);
+        const { candles } = data;
+        resolve(candles);
       })
       .catch((err) => {
         handleError('fetchTickDataFrom', err, reject);
@@ -89,12 +106,8 @@
     });
   };
 
-  oandaClient.fetchMonthsTickData = (currencyPair, fromDate) => {
-    const secondsInAMonth = (60 * 60 * 24 * 28);
-    return oandaClient.fetchTickDataFrom(currencyPair, fromDate.setSeconds(`-${secondsInAMonth}`), secondsInAMonth);
-  };
-
-  oandaClient.buy = ({ accountId, currencyPair, ammount }) => {
+  // CHECK TO SEE IF WORKS
+  oandaClient.buy = ({ accountId, currencyPair, amount }) => {
     const newOrder = {
       order: {
         units: amount,
@@ -116,7 +129,8 @@
     });
   };
 
-  oandaClient.sell = ({ accountId, currencyPair, ammount }) => {
+  // FINISH
+  oandaClient.sell = ({ accountId, currencyPair, amount }) => {
     return new Promise((resolve, reject) => {
       client.post(`/accounts/${accountId}/orders`)
         .then(({ data }) => {
