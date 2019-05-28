@@ -15,12 +15,16 @@
   }
 
   function oandaLoop(setReadyToStart) {
+    const { addToActionQueue } = actionMachine;
     // top 5 surging currency pairs
     setState('OANDA-TOP-SURGING', []);
     // { 'USD_BTC': true, ... }
     setState('OANDA-CURRENCY-IS-PROFITABLE', { });
 
+    setState('OANDA-INITIALIZED-STATES', { });
+
     // grab accounts ids
+    friendlyAlert(' FETCHING ACCOUNTS ')
     fetchAccountIds('OANDA')
       .then((accountIdsArray) => {
 
@@ -41,52 +45,12 @@
                 //grab available instruments
                 fetchAvailableInstruments('OANDA', id)
                   .then((instrumentsArray) => {
+                    setState('OANDA-AVAILABLE-INSTRUMENTS', instrumentsArray);
                     friendlyAlert(' INSTRUMENTS SYNCED ');
                     let count = instrumentsArray.length;
-                    friendlyAlert(` LOOPING THROUGH - ${count} - INSTRUMENTS`);
+                    friendlyAlert(` INITIALIZING - ${count} - INSTRUMENTS`);
                     instrumentsArray.forEach(({ name }) => {
-
-                      // FETCH MONTHS TICK DATA
-                      const secondsInAMonth = (60 * 60 * 24 * 28);
-
-
-                      // loop through seconds in a month / 5000 for all itteration counts
-                      let fetchCount = secondsInAMonth / 5000 / 5;
-
-                      console.log(fetchCount);
-                      process.exit(1)
-
-                      for (var i = 1; i < secondsInAMonth / 5000 / 5; i++) {
-
-                        const dateToStep = moment().subtract(i * 5000, 'seconds').unix();
-
-                        fetchTickDataFrom('OANDA', name, dateToStep, 5000)
-                          .then((candlesArray) => {
-
-                            // if this is too big for ram put in a graph db
-                            // setState(`OANDA-CANDLE-DATA-MONTH-${name}`, candlesArray);
-                            // setState(`OANDA-CANDLE-AVERAGES-${name}`, generateVelocitiesArrayFromCandles(candlesArray));
-
-                            fetchCount -= 1;
-
-                            friendlyAlert(` ITTERATIONS LEFT - ${count} `);
-
-                            if (fetchCount <= 0) {
-                              count -= 1;
-
-                              if (count >= 0) {
-                                friendlyAlert(' DATA SET IS HYRDRATED - STARTING LOOP ');
-                                actionMachine.setReadyToStart();
-                                done();
-                              }
-
-                            }
-                          })
-                          .catch(handleError);
-
-                      }
-
-
+                      addToActionQueue('INSTANT', { name: 'INITIALIZE-INSTRUMENT', params: { name } });
                     });
 
                   })

@@ -1,6 +1,6 @@
 ((actionMachine, { stateMachine }) => {
   const { runActionQueue, addToActionQueue, readyToStart } = actionMachine;
-  addToActionQueue('FETCH-PRICES', { name: 'FIRST-RUN' });
+  addToActionQueue('INSTANT', { name: 'FIRST-RUN' });
 
   const startLoopsIntervalSpeed = 1000;
   const checkForProfitLoopIntervalSpeed = 250;
@@ -26,7 +26,7 @@
   // consider using another account or even API purely for gets and a another for placing orders
   function startLoops () {
     if (readyToStart() === false) {
-      runActionQueue('FETCH-PRICES');
+      runActionQueue('INSTANT');
       setTimeout(() => {
         return startLoops();
       }, startLoopsIntervalSpeed);

@@ -1,6 +1,30 @@
-((actionMachine, actions, newID, colors) => {
+((actionMachine, actions, newID, colors, moment) => {
   let actionQueue = {};
   let readyToStart = false;
+  const maxCallCount = 100;
+  let callCount = [];
+  let lastCallTimeStamp = Date.now();
+
+  function hasCallsAvailable() {
+    const now = moment().unix();
+
+    const lowestDate = callCount.sort((a, b) => {
+      return a - b;
+    })[callCount.length];
+
+    const callCountUnderLimit = (callCount.length < maxCallCount);
+    const lastDateWasOverASecond = (((lowestDate || 1) + 1500) < now);
+    const canCall = (callCountUnderLimit === true && lastDateWasOverASecond === true);
+    return canCall;
+  }
+
+  function addToCallCount() {
+    callCount.unshift(moment().unix());
+  }
+
+  function subtractFromCallCount() {
+    callCount.pop();
+  }
 
   // remove from this and use stateMachine
   actionMachine.readyToStart = () => readyToStart;
@@ -11,13 +35,27 @@
 
   actionMachine.runAction = (queueName, actionObj) => {
     try {
-      const { name, params, isRunning, id } = actionObj;
+      const { name, params, isRunning, id, hasAjax } = actionObj;
       if (isRunning === false) {
         if (actions[name] !== undefined) {
           actionMachine.updateActionInQueue(queueName, id, { isRunning: true });
-          actions[name](params, () => {
-            actionMachine.removeFromActionQueue(queueName, id);
-          });
+
+          if (hasAjax === true) {
+            if (hasCallsAvailable() === true) {
+              addToCallCount();
+              actions[name](params, () => {
+                actionMachine.removeFromActionQueue(queueName, id);
+                subtractFromCallCount();
+              }, () => {
+                actionMachine.updateActionInQueue(queueName, id, { isRunning: false });
+              });
+            }
+            actionMachine.updateActionInQueue(queueName, id, { isRunning: false });
+          } else {
+            actions[name](params, () => {
+              actionMachine.removeFromActionQueue(queueName, id);
+            });
+          }
         } else {
           console.log(` Action: ${name} is not bound to actions `.bgWhite.red);
         }
@@ -85,5 +123,6 @@
   module.exports,
   require('../actions'),
   require('uuid/v1'),
-  require('colors')
+  require('colors'),
+  require('moment')
 );

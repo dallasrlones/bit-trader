@@ -2,7 +2,7 @@
 
   const client = axios.create({
     baseURL: `${baseOandaUrl}/v3`,
-    timeout: 30000,
+    timeout: 60 * 60 * 10,
     headers: {
       'Authorization': oandaAuthHeader,
       'Content-Type': 'application/json'
@@ -15,6 +15,7 @@
   function handleError(methodName, err, reject) {
     console.log(`${'oandaClient'.yellow} - ${methodName.toString().green} - ${err.toString().red}`);
     console.log(err);
+    console.log(' retrying ');
     reject(err);
   }
 
