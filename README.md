@@ -39,7 +39,7 @@
 
 ## TO-DO
 
-  Create AJAX limit machine
+  Add a buy and sell in progress so no duplicates
 
   Create candles catch up to last bulk date
 
