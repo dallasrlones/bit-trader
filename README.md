@@ -41,6 +41,8 @@
 
   Add a buy and sell in progress so no duplicates
 
+  Save candle info to DB or see if it can fit in cache
+
   Create candles catch up to last bulk date
 
   Update candle data set every 5 seconds with new pricing live data
