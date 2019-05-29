@@ -1,4 +1,4 @@
-(({ actionMachine, stateMachine, traderMachine, utils }, moment) => {
+(({ actionMachine, stateMachine, traderMachine, utils }) => {
   const { getState, setState } = stateMachine;
   const {
     fetchAccountIds,
@@ -73,6 +73,5 @@
   };
 
 })(
-  require('../services'),
-  require('moment')
+  require('../services')
 );

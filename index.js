@@ -28,8 +28,10 @@
         return startLoops();
       }, retrySpeed);
     } else {
-      startUpdateLoop();
-      checkForProfitLoop();
+      setTimeout(() => {
+        startUpdateLoop();
+        checkForProfitLoop();
+      }, 5000)
     }
   };
 

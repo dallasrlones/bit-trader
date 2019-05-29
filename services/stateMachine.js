@@ -10,15 +10,13 @@
   };
 
   stateMachine.addToInstrumentCandles = (name, newData) => {
-    console.log('name', name);
-    console.log('newData', newData);
-    process.exit(1)
-    if (state[`${name}-DATA-SET`] === undefined) {
-      state[`${name}-DATA-SET`] = newData;
-      return;
+    // CHANGE LATER
+    if (!newData.length || newData.length === 0) {
+      console.log(name);
+      console.log(newData);
+      process.exit(1);
     }
-
-    state[`${name}-DATA-SET`] = state[`${name}-DATA-SET`].join(newData);
+    state[`${name}-DATA-SET`] = newData;
   };
 
   stateMachine.getInstrumentCandles = name => {
@@ -29,7 +27,7 @@
     state[`${name}-AVGS`] = avgsObj;
   };
 
-  stateMachine.getInstrumentAvgs = () => {
+  stateMachine.getInstrumentAvgs = name => {
     return state[`${name}-AVGS`];
   };
 })

@@ -1,4 +1,4 @@
-(({ stateMachine, actionMachine, traderMachine, utils }, moment) => {
+(({ stateMachine, actionMachine, traderMachine, utils }) => {
   const { getState, setState } = stateMachine;
   const { actionsError, friendlyAlert } = utils;
 
@@ -11,21 +11,23 @@
 
     try {
       // 900 seconds
-      const startDate = (60 * 15);
+      const timeBack = (1000 * 60 * 15) + 5000;
       // start date divided by 5 second intervals devided by 5k max limit on API call
-      const itterations = Math.ceil(startDate / 5 / 5000);
+      const itterations = Math.ceil(timeBack / 5000 / 5000);
 
       // friendlyAlert(` SETTING - ${name} - COUNT `);
       setState(`INITIALIZING-${name}-COUNT`, itterations);
 
       if (itterations > 1) {
         for (var i = 0; i <= itterations; i++) {
-          const fromDate = moment().subtract((i + 1) * itterations, 'seconds').unix();
+          const fromDate = new Date(new Date().getTime() - (i + 1) / itterations).toISOString();
           addToActionQueue('INSTANT', { name: 'INITIALIZE-INSTRUMENT-SHARD', params: { name, fromDate }, hasAjax: true });
         }
       } else {
-        const fromDate = moment().subtract(startDate, 'seconds').unix();
-        addToActionQueue('INSTANT', { name: 'INITIALIZE-INSTRUMENT-SHARD', params: { name, fromDate }, hasAjax: true });
+        const fromDate = new Date(
+          new Date(new Date().toLocaleString("en-US", {timeZone: "America/Denver"})) - timeBack
+        ).toISOString()
+        addToActionQueue('INSTANT', { name: 'INITIALIZE-INSTRUMENT-SHARD', params: { name, fromDate, limit: (timeBack / 1000 / 5) }, hasAjax: true });
       }
       done();
     } catch (err) {
@@ -36,6 +38,5 @@
 
 })
 (
-  require('../services'),
-  require('moment')
+  require('../services')
 );

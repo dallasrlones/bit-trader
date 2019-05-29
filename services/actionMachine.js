@@ -1,4 +1,4 @@
-((actionMachine, actions, newID, colors, moment) => {
+((actionMachine, actions, newID, colors) => {
   let actionQueue = {};
   let readyToStart = false;
   const maxCallCount = 100;
@@ -6,7 +6,7 @@
   let lastCallTimeStamp = Date.now();
 
   function hasCallsAvailable() {
-    const now = moment().unix();
+    const now = new Date().getTime();
 
     const lowestDate = callCount.sort((a, b) => {
       return a - b;
@@ -19,7 +19,7 @@
   }
 
   function addToCallCount() {
-    callCount.unshift(moment().unix());
+    callCount.unshift(new Date().getTime());
   }
 
   function subtractFromCallCount() {
@@ -123,6 +123,5 @@
   module.exports,
   require('../actions'),
   require('uuid/v1'),
-  require('colors'),
-  require('moment')
+  require('colors')
 );

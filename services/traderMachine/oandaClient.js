@@ -92,7 +92,8 @@
           price: 'MBA',
           granularity,
           alignmentTimezone,
-          from,
+          // FIX LATER
+          //from,
           count,
         }
       })

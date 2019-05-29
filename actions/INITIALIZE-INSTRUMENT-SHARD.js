@@ -8,13 +8,20 @@
     actionsError('INITIALIZE-INSTRUMENT-SHARD', err);
   }
 
-  module.exports = ({ name, fromDate }, done, retry) => {
+  module.exports = ({ name, fromDate, limit }, done, retry) => {
     const { addToActionQueue } = actionMachine;
 
     try {
-      fetchTickDataFrom('OANDA', name, fromDate, 5000)
+      fetchTickDataFrom('OANDA', name, fromDate, limit || 5000)
         .then((candlesArray) => {
           setState(`INITIALIZING-${name}-COUNT`, (getState(`INITIALIZING-${name}-COUNT`) - 1));
+
+          if (candlesArray.length !== limit) {
+            handleError('candles array not the limit length');
+            console.log(candlesArray.length);
+            process.exit(1)
+            retry();
+          }
 
           addToInstrumentCandles(name, candlesArray);
 
@@ -24,7 +31,10 @@
 
           done();
         })
-        .catch(handleError);
+        .catch((err) => {
+          handleError(err);
+          retry();
+        });
 
     } catch (err) {
       handleError(err);
