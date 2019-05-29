@@ -9,6 +9,14 @@
     return state[stateName];
   };
 
+  stateMachine.setInstrumentPrice = (name, pricingObj) => {
+    state[`${name}-PRICING`] = pricingObj;
+  };
+
+  stateMachine.getInstrumentPrice = name => {
+    return state[`${name}-PRICING`];
+  };
+
   stateMachine.addToInstrumentCandles = (name, newData) => {
     // CHANGE LATER
     if (!newData.length || newData.length === 0) {

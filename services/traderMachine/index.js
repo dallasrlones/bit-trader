@@ -30,9 +30,9 @@
   //   return apiBank[apiName].fetchAccountBalance(accountId);
   // };
 
-  traderMachine.fetchCurrentPricingForInstruments = apiName => {
+  traderMachine.fetchCurrentPricingForInstruments = (apiName, accountId, instrumentsArray) => {
     checkExistsInAPIBank(apiName);
-    return apiBank[apiName].fetchCurrentPricingForInstruments();
+    return apiBank[apiName].fetchCurrentPricingForInstruments(accountId, instrumentsArray);
   };
 
   // traderMachine.fetchCurrentOrders = (apiName, accountId) => {

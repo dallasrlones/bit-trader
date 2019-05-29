@@ -11,8 +11,9 @@
   function checkForProfitLoop() {
     // THIS LOOP RUNS EVERY 250 MILLISECONDS
     const checkForProfitLoop = setInterval(() => {
-      addToActionQueue('PROFIT-CHECK', { name: 'FETCH-ACCOUNT-DATA' });
+      addToActionQueue('PROFIT-CHECK', { name: 'FETCH-ACCOUNT-DATA', hasAjax: true });
       // addToActionQueue('PROFIT-CHECK', { name: 'FETCH-PRICES' });
+      addToActionQueue('PROFIT-CHECK', { name: 'UPDATE-CURRENT-PRICES', hasAjax: true });
       runActionQueue('PROFIT-CHECK');
     }, checkForProfitLoopIntervalSpeed);
   }

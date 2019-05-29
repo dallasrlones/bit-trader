@@ -62,9 +62,10 @@
 
   oandaClient.fetchCurrentPricingForInstruments = (accountId, instrumentsArray) => {
     return new Promise((resolve, reject) => {
-      client.get(`/accounts/${accountId}/pricing`, { params: { instruments: instrumentsArray.join('%2') } })
+      client.get(`/accounts/${accountId}/pricing`, { params: { instruments: instrumentsArray.join(',') } })
         .then(({ data }) => {
-          resolve(data);
+          const { prices } = data;
+          resolve(prices);
         })
         .catch((err) => {
           handleError('fetchCurrentPricingForInstruments', err, reject);

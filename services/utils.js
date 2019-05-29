@@ -79,7 +79,7 @@
     // } ]
     const lastTickPercentageChange = utils.getPercentageChanged(avgsArray[0].percentageChanged, currentPrice);
 
-    if (lastTickPercentageChange >= (avgsArray[0] * 4)) {
+    if (lastTickPercentageChange >= (avgsArray[0] * 1)) {
       return true;
     }
 
