@@ -15,7 +15,6 @@
   function handleError(methodName, err, reject) {
     console.log(`${'oandaClient'.yellow} - ${methodName.toString().green} - ${err.toString().red}`);
     console.log(err);
-    console.log(' retrying ');
     reject(err);
   }
 

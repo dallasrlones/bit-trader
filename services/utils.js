@@ -16,6 +16,20 @@
     return (decreaseValue / oldNumber) * 100;
   };
 
+  utils.generateInstrumentAvgs = candlesArray => {
+
+    console.log('candlesArray', candlesArray);
+
+    const avgObj = [];
+
+    candlesArray.forEach(candle => {
+      console.log('candle', candle);
+      process.exit(1);
+    });
+
+    return avgObj;
+  };
+
   utils.getCandlePercentageChanged = (oldCandle, newCandle) => {
     return {
       c: utils.getPercentageChanged(oldCandle.c, newCandle.c),

@@ -1,6 +1,6 @@
 (({ stateMachine, actionMachine, utils }) => {
   const { getState, setState } = stateMachine;
-  const { actionsError } = utils;
+  const { actionsError, friendlyAlert } = utils;
 
 
   function handleError(err) {
@@ -17,7 +17,7 @@
       setState('OANDA-INITIALIZED-STATES', newStates);
 
       if (getState('OANDA-AVAILABLE-INSTRUMENTS').length === Object.keys(getState('OANDA-INITIALIZED-STATES') || { }).length) {
-        console.log('DONE MOTHA FUCKAS');
+        friendlyAlert(' FULLY HYDRATED ');
         setReadyToStart();
       }
 

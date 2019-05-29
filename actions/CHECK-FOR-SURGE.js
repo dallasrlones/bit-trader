@@ -1,5 +1,5 @@
 (({ actionMachine, stateMachine, utils }) => {
-  const { getState, setState } = stateMachine;
+  const { getState, setState, getInstrumentCandles } = stateMachine;
   const { actionsError } = utils;
 
   function handleError(err) {
@@ -11,11 +11,21 @@
 
     try {
 
-      
+      // get last 5 mins
+      // if now is 3x last 5 avgs its in surge
+      const availableInstruments = getState('OANDA-AVAILABLE-INSTRUMENTS');
 
-      if (algo) {
-        addToActionQueue('INSTANT', { name: 'BUY-BTC-USD', params: { currentAvgs, currentPrice } });
-      }
+      availableInstruments.forEach(({ name }) => {
+
+        const candlesArray = getInstrumentCandles(name);
+
+
+
+      });
+
+      // if (algo) {
+      //   addToActionQueue('INSTANT', { name: 'BUY-BTC-USD', params: { currentAvgs, currentPrice } });
+      // }
 
       done();
     } catch (err) {

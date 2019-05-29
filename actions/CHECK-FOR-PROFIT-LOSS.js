@@ -10,7 +10,7 @@
     const { addToActionQueue } = actionMachine;
     try {
 
-      // grab all orders from stateMachine
+      // grab all orders from stateMachine account
       // loop through each one to see if profitable
       // if needs to sell add to instant queue
 

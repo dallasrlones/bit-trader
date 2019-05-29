@@ -1,5 +1,5 @@
 (({ stateMachine, actionMachine, traderMachine, utils }) => {
-  const { getState, setState } = stateMachine;
+  const { getState, setState, addToInstrumentCandles } = stateMachine;
   const { fetchTickDataFrom } = traderMachine;
   const { actionsError, friendlyAlert } = utils;
 
@@ -16,10 +16,9 @@
         .then((candlesArray) => {
           setState(`INITIALIZING-${name}-COUNT`, (getState(`INITIALIZING-${name}-COUNT`) - 1));
 
-          // console.log(getState(`INITIALIZING-${name}-COUNT`));
+          addToInstrumentCandles(name, candlesArray);
 
-          if (getState(`INITIALIZING-${name}-COUNT`) === 1) {
-            // console.log(` ${name} - HYDRATED `);
+          if (getState(`INITIALIZING-${name}-COUNT`) === 0) {
             addToActionQueue('INSTANT', { name: 'CHECK-INITIALIZED', params: { name } });
           }
 

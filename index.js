@@ -2,20 +2,17 @@
   const { runActionQueue, addToActionQueue, readyToStart } = actionMachine;
   addToActionQueue('INSTANT', { name: 'FIRST-RUN' });
 
-  const startLoopsIntervalSpeed = 1000;
-  const checkForProfitLoopIntervalSpeed = 250;
+  const retrySpeed = 1000;
+  const checkForProfitLoopIntervalSpeed = 200;
   const instantQueueLoopIntervalSpeed = 50;
-  const defaultRetrySpeed = 1000;
 
   //require('./services/algoMachine').allPossibleAlgos();
 
   function checkForProfitLoop() {
     // THIS LOOP RUNS EVERY 250 MILLISECONDS
     const checkForProfitLoop = setInterval(() => {
-      addToActionQueue('PROFIT-CHECK', { name: 'CHECK-BALANCES' });
-      addToActionQueue('PROFIT-CHECK', { name: 'CHECK-FOR-PROFIT-LOSS' });
-      addToActionQueue('PROFIT-CHECK', { name: 'CHECK-FOR-SURGE' });
-      addToActionQueue('PROFIT-CHECK', { name: 'BTC-USD-VELOCITY' });
+      addToActionQueue('PROFIT-CHECK', { name: 'FETCH-ACCOUNT-DATA' });
+      // addToActionQueue('PROFIT-CHECK', { name: 'FETCH-PRICES' });
       runActionQueue('PROFIT-CHECK');
     }, checkForProfitLoopIntervalSpeed);
   }
@@ -29,22 +26,19 @@
       runActionQueue('INSTANT');
       setTimeout(() => {
         return startLoops();
-      }, startLoopsIntervalSpeed);
+      }, retrySpeed);
     } else {
       startUpdateLoop();
       checkForProfitLoop();
-      let fetchPriceLoop = setInterval(() => {
-        // THIS LOOP RUNS EVERY 1 SECOND
-        addToActionQueue('FETCH-PRICES', { name: 'FETCH-BTC-USD' });
-        addToActionQueue('FETCH-PRICES', { name: 'FETCH-BTC-BALANCES' });
-        runActionQueue('FETCH-PRICES');
-      }, defaultRetrySpeed);
     }
   };
 
   function startUpdateLoop(){
     // THIS LOOP RUNS EVERY 50 MILLISECONDS
     const instantQueueLoop = setInterval(() => {
+      addToActionQueue('INSTANT', { name: 'CHECK-FOR-PROFIT-LOSS' });
+      addToActionQueue('INSTANT', { name: 'UPDATE-AVERAGES' })
+      addToActionQueue('INSTANT', { name: 'CHECK-FOR-SURGE' });
       runActionQueue('INSTANT');
     }, instantQueueLoopIntervalSpeed);
   }
