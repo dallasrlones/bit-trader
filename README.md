@@ -39,6 +39,10 @@
 
 ## TO-DO
 
+  Modify average generator to include spread values
+
+  Change percentages changed, that shits wack
+
   Add a buy and sell in progress so no duplicates
 
   Save candle info to DB or see if it can fit in cache

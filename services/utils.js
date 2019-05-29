@@ -18,7 +18,7 @@
 
   utils.generateInstrumentAvgs = candlesArray => {
     try {
-      const avgObj = [];
+      const avgArray = [];
 
       for (var i in candlesArray) {
         // let newAvgObj = {
@@ -30,6 +30,8 @@
         //   ask: { o: '16.42868', h: '16.42912', l: '16.42868', c: '16.42912' }
         // };
 
+        // TO-DO: Bid and Ask prices tell you the spread, only go after spreads that aren't crazy
+
         const { volume, time, bid, mid, ask } = candlesArray[i];
         if (i > 0) {
           const newAvgObj = {
@@ -37,11 +39,13 @@
             time,
             percentageChanged: utils.getPercentageChanged(candlesArray[i - 1].ask.l, candlesArray[i].ask.l)
           };
-          avgObj.push(avgObj);
+          avgArray.push(newAvgObj);
         }
       };
 
-      return avgObj;
+      return avgArray.sort((a,b) => {
+        return new Date(a.time).getTime() > new Date(b.time).getTime();
+      });
     } catch (err) {
       console.log('UTILS - generateInstrumentAvgs');
       console.log(err);
@@ -71,15 +75,14 @@
     return velocitiesArray;
   };
 
-  utils.algo = (currentPrice, avgsArray) => {
+  utils.algo = avgsArray => {
     // avgsArray is [ {
     //   volume,
     //   time,
     //   percentageChanged
     // } ]
-    const lastTickPercentageChange = utils.getPercentageChanged(avgsArray[0].percentageChanged, currentPrice);
-
-    if (lastTickPercentageChange >= (avgsArray[0] * 1)) {
+    const lastTickPercentageChange = utils.getPercentageChanged(avgsArray[0].percentageChanged, avgsArray[1].percentageChanged);
+    if (lastTickPercentageChange <= -20000) {
       return true;
     }
 

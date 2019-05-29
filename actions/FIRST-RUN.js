@@ -46,6 +46,7 @@
                 fetchAvailableInstruments('OANDA', id)
                   .then((instrumentsArray) => {
                     setState('OANDA-AVAILABLE-INSTRUMENTS', instrumentsArray);
+                    addToActionQueue('INSTANT', { name: 'UPDATE-CURRENT-PRICES', hasAjax: true });
                     friendlyAlert(' INSTRUMENTS SYNCED ');
                     let count = instrumentsArray.length;
                     friendlyAlert(` INITIALIZING - ${count} - INSTRUMENTS`);

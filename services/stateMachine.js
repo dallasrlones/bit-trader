@@ -1,5 +1,8 @@
 ((stateMachine) => {
   let state = {};
+  let prices = {};
+  let candles = {};
+  let avgs = {};
 
   stateMachine.setState = (stateName, value) => {
     state[stateName] = value;
@@ -10,11 +13,11 @@
   };
 
   stateMachine.setInstrumentPrice = (name, pricingObj) => {
-    state[`${name}-PRICING`] = pricingObj;
+    prices[name] = pricingObj;
   };
 
   stateMachine.getInstrumentPrice = name => {
-    return state[`${name}-PRICING`];
+    return prices[name];
   };
 
   stateMachine.addToInstrumentCandles = (name, newData) => {
@@ -24,19 +27,19 @@
       console.log(newData);
       process.exit(1);
     }
-    state[`${name}-DATA-SET`] = newData;
+    candles[name] = newData;
   };
 
   stateMachine.getInstrumentCandles = name => {
-    return state[`${name}-DATA-SET`];
+    return candles[name];
   };
 
   stateMachine.setInstrumentAvgs = (name, avgsObj) => {
-    state[`${name}-AVGS`] = avgsObj;
+    avgs[name] = avgsObj;
   };
 
   stateMachine.getInstrumentAvgs = name => {
-    return state[`${name}-AVGS`];
+    return avgs[name];
   };
 })
 (

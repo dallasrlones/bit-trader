@@ -1,5 +1,5 @@
 (({ actionMachine, stateMachine, utils }) => {
-  const { getState, setState, getInstrumentAvgs, getInstrumentPrice } = stateMachine;
+  const { getState, getInstrumentAvgs } = stateMachine;
   const { actionsError, algo } = utils;
 
   function handleError(err) {
@@ -10,22 +10,14 @@
     const { addToActionQueue } = actionMachine;
 
     try {
-
-      if (getState('OANDA-CURRENT-PRICES') === undefined) {
-        done();
-        return;
-      }
-
       const availableInstruments = getState('OANDA-AVAILABLE-INSTRUMENTS');
 
       availableInstruments.forEach(({ name }) => {
 
         const avgsArray = getInstrumentAvgs(name);
-        const currentPriceObj = getInstrumentPrice(name);
 
-        if (currentPriceObj !== undefined && avgsArray.length && avgsArray > 0) {
-
-          if (algo(currentPrice, avgsArray) === true) {
+        if (avgsArray.length && avgsArray.length > 0) {
+          if (algo(avgsArray) === true) {
             //addToActionQueue('INSTANT', { name: 'BUY-BTC-USD', params: { currentAvgs, currentPrice }, hasAjax: true });
             console.log('BUY - ' + name);
           }

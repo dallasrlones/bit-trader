@@ -18,7 +18,7 @@
         instrumentsArray
       )
         .then((pricingArray) => {
-          pricingArray.forEach((pricingObj) => setInstrumentPrice(pricingObj));
+          pricingArray.forEach((pricingObj) => setInstrumentPrice(pricingObj.instrument, pricingObj));
           done();
         })
         .catch((err) => {
