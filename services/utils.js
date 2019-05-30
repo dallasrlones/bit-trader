@@ -16,9 +16,26 @@
     return (decreaseValue / oldNumber) * 100;
   };
 
+  utils.getVelocity = (oldValue, newValue) => {
+    let velocity = parseFloat(0.0);
+    oldValue = parseFloat(oldValue);
+    newValue = parseFloat(newValue);
+    if (parseFloat(newValue) > parseFloat(oldValue)) {
+      velocity = 100 / parseFloat(newValue - oldValue);
+    } else {
+      velocity = 100 / parseFloat(oldValue - newValue);
+    }
+
+    return velocity;
+  };
+
   utils.generateInstrumentAvgs = candlesArray => {
     try {
       const avgArray = [];
+
+      candlesArray.sort((a,b) => {
+        return new Date(a.time).getTime() > new Date(b.time).getTime();
+      });
 
       for (var i in candlesArray) {
         // let newAvgObj = {
@@ -32,19 +49,28 @@
 
         // TO-DO: Bid and Ask prices tell you the spread, only go after spreads that aren't crazy
 
-        const { volume, time, bid, mid, ask } = candlesArray[i];
-        if (i > 0) {
+        // const { volume, time, bid, mid, ask } = currentCandle;
+        if ( i > 0 ) {
+          const lastCandle = candlesArray[i];
+          const currentCandle = candlesArray[i - 1];
           const newAvgObj = {
-            volume,
-            time,
-            percentageChanged: utils.getPercentageChanged(candlesArray[i - 1].ask.l, candlesArray[i].ask.l)
+            volume: currentCandle.volume,
+            time: new Date(currentCandle.time).getTime(),
+            bidLowVelocity: utils.getVelocity(lastCandle.bid.l, currentCandle.bid.l),
+            bidHighVelocity: utils.getVelocity(lastCandle.bid.h, currentCandle.bid.h),
+            midLowVelocity: utils.getVelocity(lastCandle.mid.l, currentCandle.mid.l),
+            midHighVelocity: utils.getVelocity(lastCandle.mid.h, currentCandle.mid.h),
+            askLowVelocity: utils.getVelocity(lastCandle.ask.l, currentCandle.ask.l),
+            askHighVelocity: utils.getVelocity(lastCandle.ask.h, currentCandle.ask.h),
+            spread: (parseFloat(currentCandle.ask.c) - parseFloat(currentCandle.bid.c)),
+            positive: (parseFloat(currentCandle.ask.h) > parseFloat(currentCandle.ask.l))
           };
           avgArray.push(newAvgObj);
         }
       };
 
       return avgArray.sort((a,b) => {
-        return new Date(a.time).getTime() > new Date(b.time).getTime();
+        return new Date(a.time).getTime() > (new Date(b.time).getTime());
       });
     } catch (err) {
       console.log('UTILS - generateInstrumentAvgs');
@@ -79,10 +105,45 @@
     // avgsArray is [ {
     //   volume,
     //   time,
-    //   percentageChanged
+    //   askLowVelocity,
+    //   askHighVelocity,
+    //   midLowVelocity,
+    //   midHighVelocity,
+    //   bidLowVelocity,
+    //   bidHighVelocity,
     // } ]
-    const lastTickPercentageChange = utils.getPercentageChanged(avgsArray[0].percentageChanged, avgsArray[1].percentageChanged);
-    if (lastTickPercentageChange <= -20000) {
+
+    const currentPriceObj = {};
+
+    function currentAskIsGraterThanLastByXTimes(x) {
+      return avgsArray[0].bidLowVelocity > (avgsArray[1].askHighVelocity * x);
+    }
+
+    function currentSpreadIsLow() {
+      return avgsArray[0].spread <= parseFloat(0.002);
+    }
+
+    function lastTwoWerePositive() {
+      return (avgsArray[0].positive && avgsArray[1].positive)
+    }
+
+    function lastTwoVolumesAreHigherThanTwo() {
+      return (parseInt(avgsArray[0].volume) > 3 && parseInt(avgsArray[1].volume) > 2);
+    }
+
+    // GRAB AVGS AS WELL AS VELOCITY
+    // AVGS CHECK AVG PIP CHANGE TO GET A BASELINE
+
+    function allAlgos() {
+      return (
+        currentAskIsGraterThanLastByXTimes(20) &&
+        currentSpreadIsLow() &&
+        lastTwoWerePositive() &&
+        lastTwoVolumesAreHigherThanTwo()
+      );
+    }
+
+    if (allAlgos()) {
       return true;
     }
 

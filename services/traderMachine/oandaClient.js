@@ -14,7 +14,12 @@
 
   function handleError(methodName, err, reject) {
     console.log(`${'oandaClient'.yellow} - ${methodName.toString().green} - ${err.toString().red}`);
-    console.log(err);
+    if (err.toString() === 'Error: read ECONNRESET') {
+      console.log(' INTERNET SHIT THE BED ');
+    } else {
+      console.log(err);
+    }
+
     reject(err);
   }
 
