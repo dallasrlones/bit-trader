@@ -3,6 +3,7 @@
   function handleError(methodName, err){
     console.log(`${'utils'.yellow} - ${methodName} - ${err.toString().red}`);
     console.log(err);
+    process.exit(1)
   }
 
   utils.friendlyAlert = message => {
@@ -59,14 +60,21 @@
           const newAvgObj = {
             volume: currentCandle.volume,
             time: new Date(currentCandle.time).getTime(),
+            spread: (parseFloat(currentCandle.ask.c) - parseFloat(currentCandle.bid.c)),
+            positive: (parseFloat(currentCandle.ask.h) > parseFloat(currentCandle.ask.l)),
+
+            bidOpen: parseFloat(currentCandle.bid.o),
+            bidClose: parseFloat(currentCandle.bid.c),
+
+            askOpen: parseFloat(currentCandle.ask.o),
+            askClose: parseFloat(currentCandle.ask.c),
+
             bidLowVelocity: utils.getPipChange(lastCandle.bid.l, currentCandle.bid.l),
             bidHighVelocity: utils.getPipChange(lastCandle.bid.h, currentCandle.bid.h),
             midLowVelocity: utils.getPipChange(lastCandle.mid.l, currentCandle.mid.l),
             midHighVelocity: utils.getPipChange(lastCandle.mid.h, currentCandle.mid.h),
             askLowVelocity: utils.getPipChange(lastCandle.ask.l, currentCandle.ask.l),
-            askHighVelocity: utils.getPipChange(lastCandle.ask.h, currentCandle.ask.h),
-            spread: (parseFloat(currentCandle.ask.c) - parseFloat(currentCandle.bid.c)),
-            positive: (parseFloat(currentCandle.ask.h) > parseFloat(currentCandle.ask.l))
+            askHighVelocity: utils.getPipChange(lastCandle.ask.h, currentCandle.ask.h)
           };
           avgArray.push(newAvgObj);
         }
@@ -83,35 +91,36 @@
 
   function generateAverage(list) {
     const theAvg = list.reduce((results, listItem) => {
-      return results += parseFloat(listeItem);
+      return results += parseFloat(listItem);
     }, 0) / list.length;
 
-    return theAvg;
+    return theAvg.toFixed(3);
   }
 
   utils.generateAveragesFromVelocityArray = velocityArray => {
+
     try {
       const averagesObj = velocityArray.reduce((results, velocityObj) => {
         const {
-          volume
+          volume,
           time,
           bidLowVelocity,
-          bidHighVelcity,
+          bidHighVelocity,
           midLowVelocity,
-          midHighVelcity,
+          midHighVelocity,
           askLowVelocity,
-          askHighVelcity,
+          askHighVelocity,
           spread,
           positive,
         } = velocityObj;
 
         results.volumeList.push(volume);
         results.bidLowVelocityList.push(bidLowVelocity);
-        results.bidHighVelcityList.push(bidHighVelcity);
+        results.bidHighVelocityList.push(bidHighVelocity);
         results.midLowVelocityList.push(midLowVelocity);
-        results.midHighVelcityList.push(midHighVelcity);
+        results.midHighVelocityList.push(midHighVelocity);
         results.askLowVelocityList.push(askLowVelocity);
-        results.askHighVelcityList.push(askHighVelcity);
+        results.askHighVelocityList.push(askHighVelocity);
         results.spreadList.push(spread);
 
         return results;
@@ -129,14 +138,15 @@
 
 
       const averageVelocities = {
-        volumeAvgs: generateAverage(averagesObj.volumeAvgs),
-        bidLowVelocityAvgs: generateAverage(averagesObj.bidLowVelocityAvgs),
-        bidHighVelocityAvgs: generateAverage(averagesObj.bidHighVelocityAvgs),
-        midLowVelocityAvgs: generateAverage(averagesObj.midLowVelocityAvgs),
-        midHighVelocityAvgs: generateAverage(averagesObj.midHighVelocityAvgs),
-        askLowVelocityAvgs: generateAverage(averagesObj.askLowVelocityAvgs),
-        askHighVelocityAvgs: generateAverage(averagesObj.askHighVelocityAvgs),
-        spreadAvgs: generateAverage(averagesObj.spreadAvgs)
+        bidLowVelocityAvgs: generateAverage(averagesObj.bidLowVelocityList),
+        bidHighVelocityAvgs: generateAverage(averagesObj.bidHighVelocityList),
+        midLowVelocityAvgs: generateAverage(averagesObj.midLowVelocityList),
+        midHighVelocityAvgs: generateAverage(averagesObj.midHighVelocityList),
+        askLowVelocityAvgs: generateAverage(averagesObj.askLowVelocityList),
+        askHighVelocityAvgs: generateAverage(averagesObj.askHighVelocityList),
+
+        volumeAvgs: generateAverage(averagesObj.volumeList),
+        spreadAvgs: generateAverage(averagesObj.spreadList)
       };
 
       return averageVelocities;
@@ -180,7 +190,6 @@
     //   bidHighVelocity,
     // } ]
 
-    const avgsObj = generateAveragesFromVelocityArray(velocityArray);
     const {
       volumeAvgs,
       bidLowVelocityAvgs,
@@ -190,28 +199,111 @@
       askLowVelocityAvgs,
       askHighVelocityAvgs,
       spreadAvgs
-    } = avgsObj;
+    } = utils.generateAveragesFromVelocityArray(velocityArray);
 
     const currentPriceObj = {};
+    const currentCustomCandle = velocityArray[0];
 
-    function currentAskIsGraterThanLastByXTimes(x) {
-      return velocityArray[0].bidLowVelocity > (velocityArray[1].askHighVelocity * x);
+    // AVGS functions
+
+    // bid AVGS
+
+    // low
+    function currentCustomCandleIsAboveAverageBidLowVelocityByX(x) {
+      return (currentCustomCandle.bidLowVelocity > parseFloat(bidLowVelocityAvgs * x));
     }
 
-    function currentSpreadIsLow() {
-      return velocityArray[0].spread <= parseFloat(0.002);
+    // mid
+    function currentCustomCandleIsAboveAverageBidMidVelocityByX(x) {
+      return (currentCustomCandle.bidMidVelocity > parseFloat(bidMidVelocityAvgs * x));
     }
 
-    function lastTwoWerePositive() {
-      return (velocityArray[0].positive && velocityArray[1].positive)
+    // high
+    function currentCustomCandleIsAboveAverageBidHighVelocityByX(x) {
+      return (currentCustomCandle.bidHighVelocity > parseFloat(bidHighVelocityAvgs * x));
     }
 
-    function lastTwoVolumesAreHigherThanTwo() {
-      return (parseInt(velocityArray[0].volume) > 2 && parseInt(velocityArray[1].volume) > 2);
+    // asks AVGS
+
+    // low
+    function currentCustomCandleIsAboveAverageAskLowVelocityByX(x) {
+      return (currentCustomCandle.askLowVelocity > parseFloat(askLowVelocityAvgs * x));
     }
 
-    function spreadIsLowerThanVelocity() {
-      return (velocityArray[0].spread < velocityArray[0].askLowVelocity)
+    // mid
+    function currentCustomCandleIsAboveAverageAskMidVelocityByX(x) {
+      return (currentCustomCandle.askMidVelocity > parseFloat(askMidVelocityAvgs * x));
+    }
+
+    // high
+    function currentCustomCandleIsAboveAverageAskHighVelocityByX(x) {
+      return (currentCustomCandle.askHighVelocity > parseFloat(askHighVelocityAvgs * x));
+    }
+
+    function currentCustomCandleBidIsAboveAverageAskHighVelocityByX(x) {
+      return (currentCustomCandle.bidHighVelocity > parseFloat(askHighVelocityAvgs * x));
+    }
+
+    // VELOCITIES functions
+
+    function currentCustomCandleBidLowIsGraterThanLastAskHighByXTimes(x) {
+      return currentCustomCandle.bidLowVelocity > parseFloat(velocityArray[1].askHighVelocity * x);
+    }
+
+    function currentCustomCandleSpreadIsLowerThanX(x) {
+      return currentCustomCandle.spread <= parseFloat(x);
+    }
+
+    function lastXVelocityCandlesWerePositive(x) {
+      for (var i = 0; i <= x; i++) {
+        if (velocityArray[i].positive === false){
+          return false;
+        }
+      }
+      return true;
+    }
+
+    function lastXVelocityCandleVolumesAreHigherThanLimit(x, limit) {
+      for(var i = 0; i <= limit; i++) {
+        if (velocityArray[i].volume < limit) {
+          return false;
+        }
+      }
+      return true;
+    }
+
+    function spreadIsLowerThanAskLowVelocityTimesX(x) {
+      return (parseFloat(currentCustomCandle.spread * x) < currentCustomCandle.askLowVelocity);
+    }
+
+    function eldersForceIndexOverXAmount(candlesArray, x) {
+      const getEFI = (currentClose, previousClose, volume) => ((currentClose - previousClose) * volume);
+      // bid is the close
+      // (CurrentPeriodClose - (PreviousPeriod Close) X Volume = EFI
+      // 13 Period Exponential Moving Average of EFI = EFI (13)
+
+      // loop through all
+      const results = [];
+
+      for (var i = 0; i <= 13; i++) {
+        if (parseInt(i) !== 0) {
+          const currentCandle = candlesArray[i];
+          const previousCandle = candlesArray[parseInt(i - 1)];
+
+          const theEFI = getEFI(currentCandle.bidClose, previousCandle.bidClose, 13).toFixed(3);
+          results.push(theEFI);
+        }
+      }
+
+      const theQuestion = (
+        parseFloat(results[0]) >= x &&
+        parseFloat(results[1]) < parseFloat(results[0]) &&
+        parseFloat(results[2]) <= 0
+      );
+      if (theQuestion) {
+        console.log('THE EFI', results[0]);
+      }
+      return theQuestion;
     }
 
     // GRAB AVGS AS WELL AS VELOCITY
@@ -219,11 +311,13 @@
 
     function allAlgos() {
       return (
-        currentAskIsGraterThanLastByXTimes(4) &&
-        currentSpreadIsLow() &&
-        lastTwoWerePositive() &&
-        lastTwoVolumesAreHigherThanTwo(),
-        spreadIsLowerThanVelocity()
+        // currentCustomCandleBidLowIsGraterThanLastAskHighByXTimes(4) &&
+        // currentCustomCandleSpreadIsLowerThanX(0.002) &&
+        // lastXVelocityCandlesWerePositive(2) &&
+        // lastXVelocityCandleVolumesAreHigherThanLimit(2, 2) &&
+        // spreadIsLowerThanAskLowVelocityTimesX(3),
+        // currentCustomCandleBidIsAboveAverageAskHighVelocityByX(3)
+        eldersForceIndexOverXAmount(velocityArray, .02)
       );
     }
 
