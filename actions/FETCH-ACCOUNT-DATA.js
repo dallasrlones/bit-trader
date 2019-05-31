@@ -5,7 +5,7 @@
 
 
   function handleError(err) {
-    actionsError('FETCH-ACCOUNT-DATA', err);
+    actionsError('FETCH-ACCOUNT-DATA', err, retry);
   }
 
   module.exports = (params, done) => {
@@ -18,12 +18,11 @@
         })
         .catch((err) => {
           handleError(err);
+          retry();
         })
     } catch (err) {
       handleError(err);
     }
-
-
   };
 
 })

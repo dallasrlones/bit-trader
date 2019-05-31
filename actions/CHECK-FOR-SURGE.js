@@ -27,7 +27,7 @@
               buy('OANDA', {
                 accountId: getState('OANDA-ACCOUNT-PRIMARY-ID'),
                 currencyPair: name,
-                amount: 10
+                amount: 100
               })
                 .then((order) => {
                   // remove from buys on close

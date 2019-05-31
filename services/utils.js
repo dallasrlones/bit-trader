@@ -313,13 +313,13 @@
 
     function allAlgos() {
       return (
-        currentCustomCandleBidLowIsGraterThanLastAskHighByXTimes(4) &&
-        currentCustomCandleSpreadIsLowerThanX(0.002) &&
+        // currentCustomCandleBidLowIsGraterThanLastAskHighByXTimes(4) &&
+        // currentCustomCandleSpreadIsLowerThanX(0.002) &&
         lastXVelocityCandlesWerePositive(2) &&
-        lastXVelocityCandleVolumesAreHigherThanLimit(2, 2) &&
-        spreadIsLowerThanAskLowVelocityTimesX(3),
-        currentCustomCandleBidIsAboveAverageAskHighVelocityByX(3)
-        // eldersForceIndexOverXAmount(velocityArray, .1)
+        // lastXVelocityCandleVolumesAreHigherThanLimit(2, 2) &&
+        // spreadIsLowerThanAskLowVelocityTimesX(3),
+        // currentCustomCandleBidIsAboveAverageAskHighVelocityByX(3)
+        eldersForceIndexOverXAmount(velocityArray, .1)
       );
     }
 
