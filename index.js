@@ -2,7 +2,7 @@
   const { runActionQueue, addToActionQueue, readyToStart } = actionMachine;
   addToActionQueue('INSTANT', { name: 'FIRST-RUN' });
 
-  const retrySpeed = 1000;
+  const retrySpeed = 10000;
   const checkForProfitLoopIntervalSpeed = 200;
   const instantQueueLoopIntervalSpeed = 50;
 
@@ -40,7 +40,7 @@
   function startUpdateLoop(){
     // THIS LOOP RUNS EVERY 50 MILLISECONDS
     const instantQueueLoop = setInterval(() => {
-      addToActionQueue('INSTANT', { name: 'CHECK-FOR-PROFIT-LOSS' });
+      addToActionQueue('INSTANT', { name: 'CHECK-FOR-PROFIT-LOSS', hasAjax: true });
       addToActionQueue('INSTANT', { name: 'UPDATE-AVERAGES' })
       addToActionQueue('INSTANT', { name: 'CHECK-FOR-SURGE' });
       runActionQueue('INSTANT');

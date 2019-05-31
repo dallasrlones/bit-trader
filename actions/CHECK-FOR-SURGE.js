@@ -1,4 +1,4 @@
-(({ actionMachine, stateMachine, traderMachine, utils }, player) => {
+(({ actionMachine, stateMachine, traderMachine, utils, playSound }) => {
   const { getState, getInstrumentAvgs, addToBuys, checkBuyExists } = stateMachine;
   const { buy } = traderMachine;
   const { actionsError, algo } = utils;
@@ -22,7 +22,7 @@
             // set buy starting
             if (checkBuyExists(name) === false) {
               console.log('BUYING - ' + name);
-              player.play('buyBeep.mp3', () => {});
+              playSound('autoDefense.mp3');
               addToBuys(name)
               buy('OANDA', {
                 accountId: getState('OANDA-ACCOUNT-PRIMARY-ID'),
@@ -53,6 +53,5 @@
 })
 (
   require('../services'),
-  require('play-sound')(opts = {}),
   require('colors')
 );

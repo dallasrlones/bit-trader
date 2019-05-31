@@ -1,5 +1,6 @@
-(({ actionMachine, stateMachine, traderMachine, utils }) => {
-  const { getState, setState, getBuys } = stateMachine;
+(({ actionMachine, stateMachine, traderMachine, utils, playSound }) => {
+  const { getState, setState, checkSetGetHighestProfitLoss, checkBuyExists, addToBuys } = stateMachine;
+  const { close } = traderMachine;
   const { actionsError } = utils;
 
   function handleError(err) {
@@ -29,10 +30,31 @@
       // ],
       const { trades } = getState('OANDA-ACCOUNT-PRIMARY');
 
-      trades.forEach(({ id, instrument, unrealizedPL, marginUsed, openTime, initialUnits, currentUnits, state }) => {
+      trades.forEach((tradeObj) => {
+        let { id, instrument, unrealizedPL, marginUsed, openTime, initialUnits, currentUnits, state } = tradeObj;
 
         if (state === 'OPEN') {
 
+          if (checkBuyExists(instrument) === false) {
+            playSound('autoDefense.mp3');
+            addToBuys(instrument);
+          }
+
+          const highestPL = checkSetGetHighestProfitLoss(id, unrealizedPL);
+          if (parseFloat(unrealizedPL) <= highestPL * .8){
+            close('OANDA', {
+              accountId: getState('OANDA-ACCOUNT-PRIMARY-ID'),
+              tradeId: id
+            })
+              .then((closeObj) => {
+                console.log('selling - ' + instrument);
+                playSound('autoDestruct.mp3');
+              })
+              .catch((err) => {
+                handleError(err);
+                retry();
+              });
+          }
           // grab highest unrealizedPL for that trade
           // if unrealizedPL <= highestUnrealizedPL * .8 sell
             // if date is less than 5 seconds .5

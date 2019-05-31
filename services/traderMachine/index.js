@@ -55,9 +55,9 @@
     return apiBank[apiName].buy(amount);
   };
 
-  traderMachine.sell = (apiName, amount) => {
+  traderMachine.close = (apiName, params) => {
     checkExistsInAPIBank(apiName);
-    return apiBank[apiName].sell(amount);
+    return apiBank[apiName].close(params);
   };
 
 })

@@ -1,4 +1,4 @@
-((utils) => {
+((utils, { playSound }) => {
 
   function handleError(methodName, err){
     console.log(`${'utils'.yellow} - ${methodName} - ${err.toString().red}`);
@@ -13,6 +13,7 @@
   utils.actionsError = (actionName, err) => {
     console.log(`${'actions'.green}/${actionName}.js - ${err.toString().red}`);
     console.log(err);
+    playSound('error.mp3');
   }
 
   utils.getAverage = arr => arr.reduce( ( p, c ) => parseFloat(p) + parseFloat(c), 0 ) / arr.length;
@@ -302,9 +303,9 @@
         parseFloat(efiResults[0]) > parseFloat(efiResults[1]) &&
         parseFloat(efiResults[2]) <= 0
       );
-      if (theQuestion) {
-        console.log('THE EFI', efiResults[0]);
-      }
+      // if (theQuestion) {
+      //   console.log('THE EFI', efiResults[0]);
+      // }
       return theQuestion;
     }
 
@@ -319,7 +320,7 @@
         // lastXVelocityCandleVolumesAreHigherThanLimit(2, 2) &&
         // spreadIsLowerThanAskLowVelocityTimesX(3),
         // currentCustomCandleBidIsAboveAverageAskHighVelocityByX(3)
-        eldersForceIndexOverXAmount(velocityArray, .1)
+        eldersForceIndexOverXAmount(velocityArray, .2)
       );
     }
 
@@ -330,4 +331,4 @@
     return false;
   };
 
-})(module.exports, require('colors'));
+})(module.exports, require('./index'), require('colors'));

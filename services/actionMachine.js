@@ -3,17 +3,16 @@
   let readyToStart = false;
   const maxCallCount = 100;
   let callCount = [];
-  let lastCallTimeStamp = Date.now();
 
   function hasCallsAvailable() {
     const now = new Date().getTime();
 
     const lowestDate = callCount.sort((a, b) => {
       return a - b;
-    })[callCount.length];
+    })[callCount.length] || new Date().getTime() - 2000;
 
     const callCountUnderLimit = (callCount.length < maxCallCount);
-    const lastDateWasOverASecond = (((lowestDate || 1) + 1500) < now);
+    const lastDateWasOverASecond = ((lowestDate + 1200) < now);
     const canCall = (callCountUnderLimit === true && lastDateWasOverASecond === true);
     return canCall;
   }
@@ -45,12 +44,13 @@
               addToCallCount();
               actions[name](params, () => {
                 actionMachine.removeFromActionQueue(queueName, id);
-                subtractFromCallCount();
               }, () => {
                 actionMachine.updateActionInQueue(queueName, id, { isRunning: false });
+                subtractFromCallCount();
               });
             }
             actionMachine.updateActionInQueue(queueName, id, { isRunning: false });
+            subtractFromCallCount();
           } else {
             actions[name](params, () => {
               actionMachine.removeFromActionQueue(queueName, id);
@@ -110,6 +110,7 @@
   };
 
   actionMachine.removeFromActionQueue = (queueName, actionID) => {
+    subtractFromCallCount();
     if (actionQueue[queueName] !== undefined) {
       actionQueue[queueName] = actionQueue[queueName].filter((action) => {
         return action.id !== actionID;

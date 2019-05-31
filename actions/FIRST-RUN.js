@@ -1,4 +1,4 @@
-(({ actionMachine, stateMachine, traderMachine, utils }) => {
+(({ actionMachine, stateMachine, traderMachine, utils, playSound }) => {
   const { getState, setState } = stateMachine;
   const {
     fetchAccountIds,
@@ -24,6 +24,8 @@
     setState('OANDA-INITIALIZED-STATES', { });
 
     // grab accounts ids
+    playSound('diagnosticUnderway.mp3');
+
     friendlyAlert(' FETCHING ACCOUNTS ')
     fetchAccountIds('OANDA')
       .then((accountIdsArray) => {

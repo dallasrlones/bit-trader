@@ -1,4 +1,4 @@
-((oandaClient, axios, { baseOandaUrl, oandaAuthHeader }) => {
+((oandaClient, axios, { baseOandaUrl, oandaAuthHeader }, player) => {
 
   const client = axios.create({
     baseURL: `${baseOandaUrl}/v3`,
@@ -13,6 +13,7 @@
   const alignmentTimezone = 'America/Denver';
 
   function handleError(methodName, err, reject) {
+    player.play('sounds/error.mp3', () => {});
     console.log(`${'oandaClient'.yellow} - ${methodName.toString().green} - ${err.toString().red}`);
     if (err.toString() === 'Error: read ECONNRESET') {
       console.log(' INTERNET SHIT THE BED ');
@@ -137,14 +138,14 @@
   };
 
   // FINISH
-  oandaClient.sell = ({ accountId, currencyPair, amount }) => {
+  oandaClient.close = ({ accountId, tradeId }) => {
     return new Promise((resolve, reject) => {
-      client.post(`/accounts/${accountId}/orders`)
+      client.put(`/accounts/${accountId}/trades/${tradeId}/close`)
         .then(({ data }) => {
           resolve(data);
         })
         .catch((err) => {
-          handleError('sell', err, reject);
+          handleError('close', err, reject);
         });
     });
   };
@@ -154,5 +155,6 @@
   module.exports,
   require('axios'),
   require('../../config'),
+  require('play-sound')(opts = {}),
   require('colors')
 );

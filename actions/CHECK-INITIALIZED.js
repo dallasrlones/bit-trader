@@ -1,4 +1,4 @@
-(({ stateMachine, actionMachine, utils }) => {
+(({ stateMachine, actionMachine, utils, playSound }) => {
   const { getState, setState } = stateMachine;
   const { actionsError, friendlyAlert } = utils;
 
@@ -18,8 +18,11 @@
 
         console.log(` ${name} - HYDRATED - ${Object.keys(getState('OANDA-INITIALIZED-STATES') || { }).length} / ${getState('OANDA-AVAILABLE-INSTRUMENTS').length}`);
 
+        playSound('smallBeep.mp3');
+
         if (getState('OANDA-AVAILABLE-INSTRUMENTS').length === Object.keys(getState('OANDA-INITIALIZED-STATES') || { }).length) {
           friendlyAlert(' FULLY HYDRATED ');
+          playSound('transferDataComplete.mp3');
           setReadyToStart();
         }
       }

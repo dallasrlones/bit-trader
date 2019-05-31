@@ -4,6 +4,7 @@
   let candles = {};
   let avgs = {};
   let buys = {};
+  let profitLosses = {};
 
   stateMachine.setState = (stateName, value) => {
     state[stateName] = value;
@@ -11,6 +12,19 @@
 
   stateMachine.getState = (stateName) => {
     return state[stateName];
+  };
+
+  stateMachine.checkSetGetHighestProfitLoss = (id, newProfitLossValue) => {
+    const currentHigh = profitLosses[id];
+    newProfitLossValue = parseFloat(newProfitLossValue);
+    if (currentHigh !== undefined) {
+      if (parseFloat(currentHigh) < newProfitLossValue) {
+        profitLosses[id] = newProfitLossValue;
+      }
+    } else {
+      profitLosses[id] = newProfitLossValue;
+    }
+    return profitLosses[id];
   };
 
   stateMachine.addToBuys = (instrumentName) => {

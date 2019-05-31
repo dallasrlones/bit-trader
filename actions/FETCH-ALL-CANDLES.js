@@ -12,7 +12,7 @@
       const availableInstruments = getState('OANDA-AVAILABLE-INSTRUMENTS') || [];
 
       availableInstruments.forEach(({ name }) => {
-        addToActionQueue('INSTANT', { name: 'INITIALIZE-INSTRUMENT', params: { name } });
+        addToActionQueue('INSTANT', { name: 'INITIALIZE-INSTRUMENT', params: { name }, hasAjax: true });
       });
 
       done();
