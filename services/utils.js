@@ -54,9 +54,9 @@
         // };
 
         // TO-DO: Bid and Ask prices tell you the spread, only go after spreads that aren't crazy
-        if ( i > 0 ) {
-          const lastCandle = candlesArray[i];
-          const currentCandle = candlesArray[i - 1];
+        if ( parseInt(i) < candlesArray.length - 1) {
+          const lastCandle = candlesArray[parseInt(i) + 1];
+          const currentCandle = candlesArray[i];
           const newAvgObj = {
             volume: currentCandle.volume,
             time: new Date(currentCandle.time).getTime(),
@@ -282,26 +282,28 @@
       // (CurrentPeriodClose - (PreviousPeriod Close) X Volume = EFI
       // 13 Period Exponential Moving Average of EFI = EFI (13)
 
-      // loop through all
-      const results = [];
+      const efiResults = [];
 
       for (var i = 0; i <= 13; i++) {
-        if (parseInt(i) !== 0) {
+        // candles are 181 so we have an index offset to track stuff
+        if (parseInt(i) !== 13) {
           const currentCandle = candlesArray[i];
-          const previousCandle = candlesArray[parseInt(i - 1)];
+          const previousCandle = candlesArray[parseInt(i +  1)];
 
-          const theEFI = getEFI(currentCandle.bidClose, previousCandle.bidClose, 13).toFixed(3);
-          results.push(theEFI);
+          // is volume the candle volume or the volume of itterations?
+          // total volume?
+          const theEFI = getEFI(currentCandle.bidClose, previousCandle.bidClose, currentCandle.volume).toFixed(3);
+          efiResults.push(theEFI);
         }
       }
 
       const theQuestion = (
-        parseFloat(results[0]) >= x &&
-        parseFloat(results[1]) < parseFloat(results[0]) &&
-        parseFloat(results[2]) <= 0
+        parseFloat(efiResults[0]) >= x &&
+        parseFloat(efiResults[0]) > parseFloat(efiResults[1]) &&
+        parseFloat(efiResults[2]) <= 0
       );
       if (theQuestion) {
-        console.log('THE EFI', results[0]);
+        console.log('THE EFI', efiResults[0]);
       }
       return theQuestion;
     }
@@ -311,13 +313,13 @@
 
     function allAlgos() {
       return (
-        // currentCustomCandleBidLowIsGraterThanLastAskHighByXTimes(4) &&
-        // currentCustomCandleSpreadIsLowerThanX(0.002) &&
-        // lastXVelocityCandlesWerePositive(2) &&
-        // lastXVelocityCandleVolumesAreHigherThanLimit(2, 2) &&
-        // spreadIsLowerThanAskLowVelocityTimesX(3),
-        // currentCustomCandleBidIsAboveAverageAskHighVelocityByX(3)
-        eldersForceIndexOverXAmount(velocityArray, .02)
+        currentCustomCandleBidLowIsGraterThanLastAskHighByXTimes(4) &&
+        currentCustomCandleSpreadIsLowerThanX(0.002) &&
+        lastXVelocityCandlesWerePositive(2) &&
+        lastXVelocityCandleVolumesAreHigherThanLimit(2, 2) &&
+        spreadIsLowerThanAskLowVelocityTimesX(3),
+        currentCustomCandleBidIsAboveAverageAskHighVelocityByX(3)
+        // eldersForceIndexOverXAmount(velocityArray, .1)
       );
     }
 

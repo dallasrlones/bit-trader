@@ -1,5 +1,6 @@
-(({ actionMachine, stateMachine, utils }) => {
-  const { getState, getInstrumentAvgs } = stateMachine;
+(({ actionMachine, stateMachine, traderMachine, utils }, player) => {
+  const { getState, getInstrumentAvgs, addToBuys, checkBuyExists } = stateMachine;
+  const { buy } = traderMachine;
   const { actionsError, algo } = utils;
 
   function handleError(err) {
@@ -18,8 +19,25 @@
 
         if (avgsArray.length && avgsArray.length > 0) {
           if (algo(avgsArray) === true) {
-            //addToActionQueue('INSTANT', { name: 'BUY-BTC-USD', params: { currentAvgs, currentPrice }, hasAjax: true });
-            console.log('BUY - ' + name);
+            // set buy starting
+            if (checkBuyExists(name) === false) {
+              console.log('BUYING - ' + name);
+              player.play('buyBeep.mp3', () => {});
+              addToBuys(name)
+              buy('OANDA', {
+                accountId: getState('OANDA-ACCOUNT-PRIMARY-ID'),
+                currencyPair: name,
+                amount: 10
+              })
+                .then((order) => {
+                  // remove from buys on close
+                  done();
+                })
+                .catch((err) => {
+                  handleError(err);
+                  retry();
+                });
+            }
           }
 
         }
@@ -35,5 +53,6 @@
 })
 (
   require('../services'),
+  require('play-sound')(opts = {}),
   require('colors')
 );
