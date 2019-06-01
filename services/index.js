@@ -33,6 +33,16 @@
     }
   }
 
+  services.playInstrument = (name, cb) => {
+    let split = name.split('_');
+    services.playSoundInstant(`${split[0]}.mp3`, () => {
+      services.playSoundInstant('to.mp3', () => {
+        services.playSoundInstant(`${split[1]}.mp3`, () => {});
+        if(cb !== undefined) { cb(); };
+      });
+    })
+  };
+
   services.stateMachine = require('./stateMachine');
   services.traderMachine = require('./traderMachine');
   services.actionMachine = require('./actionMachine');

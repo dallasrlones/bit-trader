@@ -1,4 +1,4 @@
-(({ actionMachine, stateMachine, traderMachine, utils, playSound, playFloatNumber }) => {
+(({ actionMachine, stateMachine, traderMachine, utils, playSound, playFloatNumber, playInstrument }) => {
   const { getState, getInstrumentAvgs, addToBuys, checkBuyExists } = stateMachine;
   const { buy } = traderMachine;
   const { actionsError, algo } = utils;
@@ -23,12 +23,15 @@
             // set buy starting
             if (checkBuyExists(name) === false) {
               console.log('BUYING - ' + name);
-              playSound('autoDefense.mp3', () => {
-                playSound('opentrade', () => {
-                  playSound('efi_at.mp3', () => {
-                    playFloatNumber(efi);
+              playSoundInstant('opentrade.mp3', () => {
+                playInstrument(name, () => {
+                  playSoundInstant('efi_at.mp3', () => {
+                    playFloatNumber(efi, ()=> {
+                      playSoundInstant('defense_systems.mp3');
+                    });
                   });
                 });
+
               });
               addToBuys(name)
               buy('OANDA', {

@@ -1,6 +1,7 @@
 ((instantQueue, { stateMachine, actionMachine, utils, playSoundInstant }) => {
   const { getState, setState } = stateMachine;
   const { runActionQueue, addToActionQueue } = actionMachine;
+  const { warning } = utils;
 
   let instantQueueLoop = false;
   let tradingOpenPlayed = false;
@@ -25,6 +26,7 @@
 
         setTimeout(() => {
           playSoundInstant('market_closed.mp3');
+          warning('MARKET IS CLOSED'.red);
         }, 1000 * 30);
       }
     } else {

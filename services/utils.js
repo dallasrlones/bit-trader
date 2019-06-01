@@ -1,4 +1,17 @@
-((utils) => {
+((utils, Spinner) => {
+
+  var spinner = new Spinner({
+    text: 'INITIALIZING '.cyan,
+    stream: process.stderr,
+    onTick: function(msg){
+        this.clearLine(this.stream);
+        this.stream.write(msg);
+    }
+  });
+  spinner.setSpinnerString(22);
+  spinner.start();
+
+  spinner.setSpinnerTitle(' DATA SET HYDRATED '.cyan)
 
   function handleError(methodName, err){
     console.log(`${'utils'.yellow} - ${methodName} - ${err.toString().red}`);
@@ -7,7 +20,18 @@
   }
 
   utils.friendlyAlert = message => {
-    console.log(message.toString().bgWhite.blue);
+    //console.log(message.toString().bgWhite.blue);
+    spinner.setSpinnerTitle(` ${message} `.cyan);
+  };
+
+  utils.alert = message => {
+    //console.log(message.toString().bgWhite.blue);
+    spinner.setSpinnerTitle(` ${message} `.bgRed.black);
+  };
+
+  utils.warning = message => {
+    //console.log(message.toString().bgWhite.blue);
+    spinner.setSpinnerTitle(` ${message} `.bgYellow.black);
   };
 
   utils.actionsError = (actionName, err) => {
@@ -336,4 +360,4 @@
     return { algoMatch: false };
   };
 
-})(module.exports, require('colors'));
+})(module.exports, require('cli-spinner').Spinner, require('colors'));

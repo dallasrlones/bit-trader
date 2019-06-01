@@ -40,8 +40,10 @@
     delete buys[instrumentName];
   };
 
-  stateMachine.setInstrumentPrice = (name, pricingObj) => {
-    prices[name] = pricingObj;
+  stateMachine.setInstrumentPriceAndSpread = (pricingObj) => {
+    const { closeoutAsk, closeoutBid, instrument } = pricingObj;
+    const spread = parseFloat((closeoutAsk - closeoutBid) / closeoutAsk * 100).toFixed(3);
+    prices[instrument] = { ...pricingObj, spread };
   };
 
   stateMachine.getInstrumentPrice = name => {

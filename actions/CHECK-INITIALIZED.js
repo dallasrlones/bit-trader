@@ -16,7 +16,7 @@
         newStates[name] = true;
         setState('OANDA-INITIALIZED-STATES', newStates);
 
-        console.log(` ${name} - HYDRATED - ${Object.keys(getState('OANDA-INITIALIZED-STATES') || { }).length} / ${getState('OANDA-AVAILABLE-INSTRUMENTS').length}`);
+        friendlyAlert(` ${name} - HYDRATED - ${Object.keys(getState('OANDA-INITIALIZED-STATES') || { }).length} / ${getState('OANDA-AVAILABLE-INSTRUMENTS').length}`);
 
         playSound('smallBeep.mp3');
 
@@ -28,7 +28,9 @@
               friendlyAlert(' FULLY HYDRATED ');
               playSoundInstant('candles_up_to_date.mp3', () => {
                 friendlyAlert(' CHECKING FOR PROFIT LOSS AND POSSIBLE TRADES ');
-                playSoundInstant('initialized.mp3');
+                playSoundInstant('initialized.mp3', () => {
+                  playSoundInstant('init_ai.mp3');
+                });
               });
             });
           });

@@ -1,5 +1,5 @@
 (({ stateMachine, traderMachine, utils }) => {
-  const { getState, setInstrumentPrice } = stateMachine;
+  const { getState, setInstrumentPriceAndSpread } = stateMachine;
   const { fetchCurrentPricingForInstruments } = traderMachine;
   const { actionsError } = utils;
 
@@ -17,7 +17,6 @@
       // create an array of prices
       // grab the last 5 seconds back and create a candle
       // filter out the ones that are longer than 5 seconds
-
       const instrumentsArray = getState('OANDA-AVAILABLE-INSTRUMENTS').map(({ name }) => (name));
       fetchCurrentPricingForInstruments(
         'OANDA',
@@ -25,7 +24,9 @@
         instrumentsArray
       )
         .then((pricingArray) => {
-          pricingArray.forEach((pricingObj) => setInstrumentPrice(pricingObj.instrument, pricingObj));
+          pricingArray.forEach((pricingObj) => {
+            setInstrumentPriceAndSpread(pricingObj);
+          });
           done();
         })
         .catch((err) => {

@@ -1,4 +1,4 @@
-(({ actionMachine, stateMachine, utils, playSound }) => {
+(({ actionMachine, stateMachine, utils, playSoundInstant }) => {
   const { getState, setState } = stateMachine;
   const { friendlyAlert, actionsError, generateVelocitiesArrayFromCandles } = utils;
 
@@ -11,7 +11,6 @@
 
     try {
       friendlyAlert(' INITIALIZING DATA SET ');
-      playSound('initializing.mp3', () => { });
 
       const instrumentsArray = getState('OANDA-AVAILABLE-INSTRUMENTS');
 
