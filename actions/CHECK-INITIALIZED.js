@@ -22,11 +22,11 @@
 
         if (getState('OANDA-AVAILABLE-INSTRUMENTS').length === Object.keys(getState('OANDA-INITIALIZED-STATES') || { }).length) {
           friendlyAlert(' HISTORY HYDRATED ');
-          friendlyAlert(' UPDATING TO CURRENT CANDLES ');
           playSoundInstant('data_set_hydrated.mp3', () => {
+            friendlyAlert(' UPDATING TO CURRENT CANDLES ');
             playSoundInstant('updating_to_current.mp3', () => {
+              friendlyAlert(' FULLY HYDRATED ');
               playSoundInstant('candles_up_to_date.mp3', () => {
-                friendlyAlert(' FULLY HYDRATED ');
                 friendlyAlert(' CHECKING FOR PROFIT LOSS AND POSSIBLE TRADES ');
                 playSoundInstant('initialized.mp3');
               });

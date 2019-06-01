@@ -1,4 +1,4 @@
-((actionMachine, { stateMachine, playSound }, { instantQueue, fetchQueue }) => {
+((actionMachine, { stateMachine, playSound, utils: { friendlyAlert } }, { instantQueue, fetchQueue }) => {
   const { getState } = stateMachine;
   const { runActionQueue, addToActionQueue, readyToStart } = actionMachine;
   const { startInstantQueue } = instantQueue;
@@ -26,7 +26,8 @@
     }
   }
 
-
+  playSound('init.mp3');
+  friendlyAlert(' INITIALIZING ');
   addToActionQueue('INSTANT', { name: 'FETCH-ACCOUNT-ID', hasAjax: true });
   startInstantQueue(instantQueueLoopIntervalSpeed);
   start();
