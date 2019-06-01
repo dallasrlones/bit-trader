@@ -24,8 +24,6 @@
     setState('OANDA-INITIALIZED-STATES', { });
 
     // grab accounts ids
-    playSound('diagnosticUnderway.mp3');
-
     friendlyAlert(' FETCHING ACCOUNTS ')
     fetchAccountIds('OANDA')
       .then((accountIdsArray) => {
@@ -73,6 +71,7 @@
 
     friendlyAlert(' INITIALIZING DATA SET ');
     oandaLoop(setReadyToStart);
+    playSound('initializing.mp3', () => { });
   };
 
 })(

@@ -2,7 +2,7 @@
   const { runActionQueue, addToActionQueue, readyToStart } = actionMachine;
   addToActionQueue('INSTANT', { name: 'FIRST-RUN' });
 
-  const retrySpeed = 10000;
+  const retrySpeed = 1000;
   const checkForProfitLoopIntervalSpeed = 200;
   const instantQueueLoopIntervalSpeed = 50;
 

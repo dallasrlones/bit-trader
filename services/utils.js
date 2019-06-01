@@ -1,4 +1,4 @@
-((utils, { playSound }) => {
+((utils) => {
 
   function handleError(methodName, err){
     console.log(`${'utils'.yellow} - ${methodName} - ${err.toString().red}`);
@@ -13,7 +13,10 @@
   utils.actionsError = (actionName, err) => {
     console.log(`${'actions'.green}/${actionName}.js - ${err.toString().red}`);
     console.log(err);
-    playSound('error.mp3');
+
+    if (err.toString() !== '') {
+      require('./index').playSound('error.mp3');
+    }
   }
 
   utils.getAverage = arr => arr.reduce( ( p, c ) => parseFloat(p) + parseFloat(c), 0 ) / arr.length;
@@ -306,11 +309,13 @@
       // if (theQuestion) {
       //   console.log('THE EFI', efiResults[0]);
       // }
-      return theQuestion;
+      return { algoMatch: theQuestion, efi: parseFloat(efiResults[0]) };
     }
 
     // GRAB AVGS AS WELL AS VELOCITY
     // AVGS CHECK AVG PIP CHANGE TO GET A BASELINE
+
+    const efiAlgo = eldersForceIndexOverXAmount(velocityArray, .2);
 
     function allAlgos() {
       return (
@@ -320,15 +325,15 @@
         // lastXVelocityCandleVolumesAreHigherThanLimit(2, 2) &&
         // spreadIsLowerThanAskLowVelocityTimesX(3),
         // currentCustomCandleBidIsAboveAverageAskHighVelocityByX(3)
-        eldersForceIndexOverXAmount(velocityArray, .2)
+        efiAlgo.algoMatch
       );
     }
 
     if (allAlgos()) {
-      return true;
+      return { algoMatch: true, efi: efiAlgo.efi};
     }
 
-    return false;
+    return { algoMatch: false };
   };
 
-})(module.exports, require('./index'), require('colors'));
+})(module.exports, require('colors'));

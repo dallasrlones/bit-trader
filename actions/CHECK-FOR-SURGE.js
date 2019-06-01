@@ -1,4 +1,4 @@
-(({ actionMachine, stateMachine, traderMachine, utils, playSound }) => {
+(({ actionMachine, stateMachine, traderMachine, utils, playSound, playFloatNumber }) => {
   const { getState, getInstrumentAvgs, addToBuys, checkBuyExists } = stateMachine;
   const { buy } = traderMachine;
   const { actionsError, algo } = utils;
@@ -18,11 +18,18 @@
         const avgsArray = getInstrumentAvgs(name);
 
         if (avgsArray.length && avgsArray.length > 0) {
-          if (algo(avgsArray) === true) {
+          const { algoMatch, efi } = algo(avgsArray);
+          if (algoMatch === true) {
             // set buy starting
             if (checkBuyExists(name) === false) {
               console.log('BUYING - ' + name);
-              playSound('autoDefense.mp3');
+              playSound('autoDefense.mp3', () => {
+                playSound('opentrade', () => {
+                  playSound('efi_at.mp3', () => {
+                    playFloatNumber(efi);
+                  });
+                });
+              });
               addToBuys(name)
               buy('OANDA', {
                 accountId: getState('OANDA-ACCOUNT-PRIMARY-ID'),

@@ -26,7 +26,8 @@
       } else {
         const fromDate = new Date(
           new Date(new Date().toLocaleString("en-US", {timeZone: "America/Denver"})) - timeBack
-        ).toISOString()
+        ).toISOString();
+
         addToActionQueue('INSTANT', { name: 'INITIALIZE-INSTRUMENT-SHARD', params: { name, fromDate, limit: (timeBack / 1000 / 5) }, hasAjax: true });
       }
       done();

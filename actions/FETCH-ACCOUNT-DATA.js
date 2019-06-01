@@ -5,10 +5,10 @@
 
 
   function handleError(err) {
-    actionsError('FETCH-ACCOUNT-DATA', err, retry);
+    actionsError('FETCH-ACCOUNT-DATA', err);
   }
 
-  module.exports = (params, done) => {
+  module.exports = (params, done, retry) => {
 
     try {
       fetchAccountById('OANDA', getState('OANDA-ACCOUNT-PRIMARY-ID'))
@@ -22,6 +22,7 @@
         })
     } catch (err) {
       handleError(err);
+      retry();
     }
   };
 

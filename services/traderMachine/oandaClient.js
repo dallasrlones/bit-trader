@@ -1,19 +1,18 @@
-((oandaClient, axios, { baseOandaUrl, oandaAuthHeader }, player) => {
-
+((oandaClient, axios, { baseOandaUrl, oandaAuthHeader }) => {
+  const alignmentTimezone = 'America/Denver';
   const client = axios.create({
     baseURL: `${baseOandaUrl}/v3`,
-    timeout: 60 * 60 * 10,
+    timeout: 1000 * 10,
     headers: {
       'Authorization': oandaAuthHeader,
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'alignmentTimezone': alignmentTimezone
     }
   });
-
   const granularity = 'S5';
-  const alignmentTimezone = 'America/Denver';
+
 
   function handleError(methodName, err, reject) {
-    player.play('sounds/error.mp3', () => {});
     console.log(`${'oandaClient'.yellow} - ${methodName.toString().green} - ${err.toString().red}`);
     if (err.toString() === 'Error: read ECONNRESET') {
       console.log(' INTERNET SHIT THE BED ');
@@ -98,7 +97,6 @@
         params: {
           price: 'MBA',
           granularity,
-          alignmentTimezone,
           // FIX LATER
           //from,
           count,
@@ -155,6 +153,6 @@
   module.exports,
   require('axios'),
   require('../../config'),
-  require('play-sound')(opts = {}),
+  require('../index'),
   require('colors')
 );

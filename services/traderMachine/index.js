@@ -60,8 +60,10 @@
     return apiBank[apiName].close(params);
   };
 
+  module.exports = traderMachine;
+
 })
 (
-  module.exports,
+  { },
   require('colors')
 );
