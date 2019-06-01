@@ -58,6 +58,15 @@
     candles[name] = newData;
   };
 
+  // custom current candles
+
+  stateMachine.addToCustomCandles = priceObj => {
+    // unshift
+    // pop
+  };
+
+  // candles initial load
+
   stateMachine.getInstrumentCandles = name => {
     return candles[name];
   };
@@ -69,7 +78,9 @@
   stateMachine.getInstrumentAvgs = name => {
     return avgs[name];
   };
+
+  module.exports = stateMachine;
 })
 (
-  module.exports
+  {}
 );

@@ -21,8 +21,17 @@
         playSound('smallBeep.mp3');
 
         if (getState('OANDA-AVAILABLE-INSTRUMENTS').length === Object.keys(getState('OANDA-INITIALIZED-STATES') || { }).length) {
-          friendlyAlert(' FULLY HYDRATED ');
-          playSoundInstant('initialized.mp3');
+          friendlyAlert(' HISTORY HYDRATED ');
+          friendlyAlert(' UPDATING TO CURRENT CANDLES ');
+          playSoundInstant('data_set_hydrated.mp3', () => {
+            playSoundInstant('updating_to_current.mp3', () => {
+              playSoundInstant('candles_up_to_date.mp3', () => {
+                friendlyAlert(' FULLY HYDRATED ');
+                friendlyAlert(' CHECKING FOR PROFIT LOSS AND POSSIBLE TRADES ');
+                playSoundInstant('initialized.mp3');
+              });
+            });
+          });
           setReadyToStart();
         }
       }

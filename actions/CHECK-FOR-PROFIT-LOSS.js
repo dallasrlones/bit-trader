@@ -30,42 +30,44 @@
       // ],
       const { trades } = getState('OANDA-ACCOUNT-PRIMARY');
 
-      trades.forEach((tradeObj) => {
-        let { id, instrument, unrealizedPL, marginUsed, openTime, initialUnits, currentUnits, state } = tradeObj;
+      if (trades.length > 0) {
+        trades.forEach((tradeObj) => {
+          let { id, instrument, unrealizedPL, marginUsed, openTime, initialUnits, currentUnits, state } = tradeObj;
 
-        if (state === 'OPEN') {
+          if (state === 'OPEN') {
 
-          if (checkBuyExists(instrument) === false) {
-            playSound('autoDefense.mp3');
-            addToBuys(instrument);
-          }
+            if (checkBuyExists(instrument) === false) {
+              playSound('autoDefense.mp3');
+              addToBuys(instrument);
+            }
 
-          const highestPL = checkSetGetHighestProfitLoss(id, unrealizedPL);
-          if (parseFloat(unrealizedPL) <= highestPL * .8){
-            close('OANDA', {
-              accountId: getState('OANDA-ACCOUNT-PRIMARY-ID'),
-              tradeId: id
-            })
-              .then((closeObj) => {
-                console.log('selling - ' + instrument);
-                playSound('autoDestruct.mp3');
+            const highestPL = checkSetGetHighestProfitLoss(id, unrealizedPL);
+            if (parseFloat(unrealizedPL) <= highestPL * .8){
+              close('OANDA', {
+                accountId: getState('OANDA-ACCOUNT-PRIMARY-ID'),
+                tradeId: id
               })
-              .catch((err) => {
-                handleError(err);
-                retry();
-              });
+                .then((closeObj) => {
+                  console.log('selling - ' + instrument);
+                  playSound('autoDestruct.mp3');
+                })
+                .catch((err) => {
+                  handleError(err);
+                  retry();
+                });
+            }
+            // grab highest unrealizedPL for that trade
+            // if unrealizedPL <= highestUnrealizedPL * .8 sell
+              // if date is less than 5 seconds .5
+              // 6 .6
+              // 7 .7
+              // and stop at 8
+              // the older it gets make it .9 but only when unrealizedPL is in the mega bucks
+
           }
-          // grab highest unrealizedPL for that trade
-          // if unrealizedPL <= highestUnrealizedPL * .8 sell
-            // if date is less than 5 seconds .5
-            // 6 .6
-            // 7 .7
-            // and stop at 8
-            // the older it gets make it .9 but only when unrealizedPL is in the mega bucks
 
-        }
-
-      });
+        });
+      }
       done();
     } catch (err) {
       handleError(err);

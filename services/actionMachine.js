@@ -9,10 +9,10 @@
 
     const lowestDate = callCount.sort((a, b) => {
       return a - b;
-    })[callCount.length] || new Date().getTime() - 2000;
+    })[callCount.length] || new Date().getTime() - 1201;
 
     const callCountUnderLimit = (callCount.length < maxCallCount);
-    const lastDateWasOverASecond = ((lowestDate + 1200) < now);
+    const lastDateWasOverASecond = ((lowestDate + 1200) <= now);
     const canCall = (callCountUnderLimit === true && lastDateWasOverASecond === true);
     return canCall;
   }
@@ -32,6 +32,38 @@
     readyToStart = true;
   };
 
+  actionMachine.addToActionQueue = (queueName, actionObj) => {
+    let newActionObj = { ...actionObj, id: newID(), isRunning: false };
+    if (actionQueue[queueName] === undefined) {
+      actionQueue[queueName] = [];
+    }
+    actionQueue[queueName].push(newActionObj);
+  };
+
+  actionMachine.removeFromActionQueue = (queueName, actionID) => {
+    if (actionQueue[queueName] !== undefined) {
+      actionQueue[queueName] = actionQueue[queueName].filter((action) => {
+        return action.id !== actionID;
+      });
+    } else {
+      console.log(`${'services'.yellow}/actionMachine.js - ${'removeFromActionQueue'.cyan} - ${queueName} does not exist`);
+    }
+  };
+
+  actionMachine.updateActionInQueue = (queueName, id, newObj) => {
+    if (actionQueue[queueName] !== undefined) {
+      actionQueue[queueName] = actionQueue[queueName].map(actionObj => {
+        if (actionObj.id !== id) {
+          return actionObj;
+        } else {
+          return { ...actionObj, ...newObj };
+        }
+      });
+    } else {
+      console.log(`${'services'.yellow}/actionMachine.js - ${'updateActionInQueue'.cyan} - ${queueName} does not exist`);
+    }
+  };
+
   actionMachine.runAction = (queueName, actionObj) => {
     try {
       const { name, params, isRunning, id, hasAjax } = actionObj;
@@ -48,10 +80,11 @@
                 actionMachine.updateActionInQueue(queueName, id, { isRunning: false });
                 subtractFromCallCount();
               });
+            } else {
+              actionMachine.updateActionInQueue(queueName, id, { isRunning: false });
             }
-            actionMachine.updateActionInQueue(queueName, id, { isRunning: false });
-            subtractFromCallCount();
           } else {
+            //console.log('no ajax');
             actions[name](params, () => {
               actionMachine.removeFromActionQueue(queueName, id);
             });
@@ -59,6 +92,8 @@
         } else {
           console.log(` Action: ${name} is not bound to actions `.bgWhite.red);
         }
+      } else {
+        actionMachine.removeFromActionQueue(queueName, id);
       }
     } catch (err) {
       console.log(`${'services'.yellow}/actionMachine.js - ${'runAction'.cyan} - ${err.toString().red}`);
@@ -84,39 +119,6 @@
       });
     } catch (err) {
       console.log(`${'services'.yellow}/actionMachine.js - ${'runActionQueue'.cyan} - ${err.toString().red}`);
-    }
-  };
-
-  actionMachine.updateActionInQueue = (queueName, id, newObj) => {
-    if (actionQueue[queueName] !== undefined) {
-      actionQueue[queueName] = actionQueue[queueName].map(actionObj => {
-        if (actionObj.id !== id) {
-          return actionObj;
-        } else {
-          return { ...actionObj, ...newObj };
-        }
-      });
-    } else {
-      console.log(`${'services'.yellow}/actionMachine.js - ${'updateActionInQueue'.cyan} - ${queueName} does not exist`);
-    }
-  };
-
-  actionMachine.addToActionQueue = (queueName, actionObj) => {
-    let newActionObj = { ...actionObj, id: newID(), isRunning: false };
-    if (actionQueue[queueName] === undefined) {
-      actionQueue[queueName] = [];
-    }
-    actionQueue[queueName].push(newActionObj);
-  };
-
-  actionMachine.removeFromActionQueue = (queueName, actionID) => {
-    subtractFromCallCount();
-    if (actionQueue[queueName] !== undefined) {
-      actionQueue[queueName] = actionQueue[queueName].filter((action) => {
-        return action.id !== actionID;
-      });
-    } else {
-      console.log(`${'services'.yellow}/actionMachine.js - ${'removeFromActionQueue'.cyan} - ${queueName} does not exist`);
     }
   };
 

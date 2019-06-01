@@ -5,7 +5,7 @@
 
 
   function handleError(err) {
-    actionsError('FETCH-ACCOUNT-DATA', err);
+    actionsError('UPDATE-ACCOUNT-DATA', err);
   }
 
   module.exports = (params, done, retry) => {

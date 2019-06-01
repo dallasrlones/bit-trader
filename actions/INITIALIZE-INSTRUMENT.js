@@ -16,6 +16,7 @@
       const itterations = Math.ceil(timeBack / 5000 / 5000);
 
       // friendlyAlert(` SETTING - ${name} - COUNT `);
+      setState('OANDA-INITIALIZED-STATES', {});
       setState(`INITIALIZING-${name}-COUNT`, itterations);
 
       if (itterations > 1) {

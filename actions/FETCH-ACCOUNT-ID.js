@@ -1,29 +1,36 @@
 (({ stateMachine, traderMachine, utils }) => {
   const { getState, setState } = stateMachine;
-  const { fetchAvailableInstruments } = traderMachine;
+  const { fetchAccountIds } = traderMachine;
   const { actionsError } = utils;
 
   function handleError(err) {
-    actionsError('UPDATE-AVAILABLE-INSTRUMENTS', err);
+    actionsError('FETCH-ACCOUNT-ID', err);
   }
 
   module.exports = (params, done, retry) => {
     try {
+      fetchAccountIds('OANDA')
+        .then((accounts) => {
+          accounts.forEach(({ id }) => {
+            // CHECK TO SEE IF 001 IS YOUR PRIMARY ACCOUNT
+            if (id.slice((id.length - 3), id.length) === '001') {
+              setState('OANDA-ACCOUNT-PRIMARY-ID', id);
+            }
 
-      fetchAvailableInstruments('OANDA', getState('OANDA-ACCOUNT-PRIMARY-ID'))
-        .then((instruments) => {
-          setState('OANDA-AVAILABLE-INSTRUMENTS', instruments);
+          });
+
           done();
         })
         .catch(err => {
           handleError(err);
           retry();
         });
-
     } catch (err) {
       handleError(err);
       done();
     }
+
+
   };
 
 })
