@@ -95,7 +95,7 @@
     return new Promise((resolve, reject) => {
       client.get(`/instruments/${currencyPair}/candles`, {
         params: {
-          price: 'MBA',
+          price: 'BA',
           granularity,
           // FIX LATER
           //from,

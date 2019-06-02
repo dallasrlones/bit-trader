@@ -1,4 +1,4 @@
-((utils, Spinner) => {
+((utils, Spinner, { getState }) => {
 
   var spinner = new Spinner({
     text: 'INITIALIZING '.cyan,
@@ -360,4 +360,4 @@
     return { algoMatch: false };
   };
 
-})(module.exports, require('cli-spinner').Spinner, require('colors'));
+})(module.exports, require('cli-spinner').Spinner, require('./stateMachine'), require('colors'));

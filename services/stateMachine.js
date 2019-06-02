@@ -5,6 +5,7 @@
   let avgs = {};
   let buys = {};
   let profitLosses = {};
+  const mostRecentPrices = {};
 
   stateMachine.setState = (stateName, value) => {
     state[stateName] = value;
@@ -41,8 +42,56 @@
   };
 
   stateMachine.setInstrumentPriceAndSpread = (pricingObj) => {
-    const { closeoutAsk, closeoutBid, instrument } = pricingObj;
+    const { closeoutAsk, closeoutBid, instrument, time } = pricingObj;
     const spread = parseFloat((closeoutAsk - closeoutBid) / closeoutAsk * 100).toFixed(3);
+
+    if(mostRecentPrices[instrument] === undefined) {
+      mostRecentPrices[instrument] = [pricingObj];
+    } else {
+      mostRecentPrices[instrument].unshift(pricingObj);
+
+      if (mostRecentPrices[instrument].length > 5) {
+        mostRecentPrices[instrument].pop();
+      }
+
+      if (mostRecentPrices[instrument].length === 5 && candles[instrument] !== undefined) {
+        const currentPrices = mostRecentPrices[instrument];
+
+        const customCandle = currentPrices.reduce((results, customPriceObj) => {
+          if (parseFloat(results.bid.h) < parseFloat(customPriceObj.closeoutBid)) {
+            results.bid.h = customPriceObj.bid.h;
+          }
+
+          if (parseFloat(results.bid.l) > parseFloat(customPriceObj.closeoutBid)) {
+            results.bid.l = customPriceObj.closeoutBid;
+          }
+
+          if (parseFloat(results.ask.h) < parseFloat(customPriceObj.closeoutAsk)) {
+            results.ask.h = customPriceObj.ask.h;
+          }
+
+          if (parseFloat(results.ask.l) > parseFloat(customPriceObj.closeoutAsk)) {
+            results.ask.l = customPriceObj.ask.l;
+          }
+
+          if (customPriceObj.closeoutBid !== closeoutBid){
+            results.volume += 1;
+          }
+
+          return results;
+        },
+        {
+          time,
+          volume: 0,
+          bid: { o: currentPrices[4].closeoutBid, h: currentPrices[4].closeoutBid, l: currentPrices[4].closeoutBid, c: currentPrices[0].closeoutBid },
+          ask: { o: currentPrices[4].closeoutAsk, h: currentPrices[4].closeoutAsk, l: currentPrices[4].closeoutAsk, c: currentPrices[0].closeoutAsk }
+        });
+
+        candles[instrument].unshift(customCandle);
+        candles[instrument].pop();
+      }
+    }
+
     prices[instrument] = { ...pricingObj, spread };
   };
 
