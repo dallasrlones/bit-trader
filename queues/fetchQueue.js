@@ -1,6 +1,5 @@
 ((fetchQueue, { stateMachine, actionMachine, utils, playSound }) => {
   const { runActionQueue, addToActionQueue } = actionMachine;
-
   let fetchQueueLoop = false;
 
   fetchQueue.startFetchQueue = (fetchQueueLoopIntervalSpeed) => {

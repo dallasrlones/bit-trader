@@ -124,7 +124,6 @@
   }
 
   utils.generateAveragesFromVelocityArray = velocityArray => {
-
     try {
       const averagesObj = velocityArray.reduce((results, velocityObj) => {
         const {
@@ -204,6 +203,8 @@
     return velocitiesArray;
   };
 
+
+  // change so its testable ya doof
   utils.algo = velocityArray => {
     // velocityArray is [ {
     //   volume,
@@ -281,7 +282,7 @@
     }
 
     function lastXVelocityCandlesWerePositive(x) {
-      for (var i = 0; i <= x; i++) {
+      for (var i = 0; i < x; i++) {
         if (velocityArray[i].positive === false){
           return false;
         }
@@ -343,11 +344,12 @@
       return (
         // currentCustomCandleBidLowIsGraterThanLastAskHighByXTimes(4) &&
         // currentCustomCandleSpreadIsLowerThanX(0.002) &&
-        lastXVelocityCandlesWerePositive(2) &&
+        // lastXVelocityCandlesWerePositive(2) &&
         // lastXVelocityCandleVolumesAreHigherThanLimit(2, 2) &&
         // spreadIsLowerThanAskLowVelocityTimesX(3),
         // currentCustomCandleBidIsAboveAverageAskHighVelocityByX(3)
-        efiAlgo.algoMatch
+        //efiAlgo.algoMatch
+        lastXVelocityCandlesWerePositive(2)
       );
     }
 

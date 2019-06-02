@@ -8,7 +8,6 @@
   }
 
   module.exports = (params, done, retry) => {
-
     try {
 
       // find the most recent candle from candles array
@@ -25,6 +24,7 @@
       )
         .then((pricingArray) => {
           pricingArray.forEach((pricingObj) => {
+            console.log(new Date(pricingObj.time).getTime());
             setInstrumentPriceAndSpread(pricingObj);
           });
           done();

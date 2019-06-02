@@ -9,7 +9,6 @@
   }
 
   module.exports = (params, done, retry) => {
-
     try {
       fetchAccountById('OANDA', getState('OANDA-ACCOUNT-PRIMARY-ID'))
         .then((account) => {

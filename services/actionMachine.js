@@ -41,10 +41,10 @@
   };
 
   actionMachine.removeFromActionQueue = (queueName, actionID) => {
-    if (actionQueue[queueName] !== undefined) {
-      actionQueue[queueName] = actionQueue[queueName].filter((action) => {
-        return action.id !== actionID;
-      });
+    if (actionQueue[queueName] !== undefined || actionQueue[queueName].length > 0) {
+      let currentQueue = [...actionQueue[queueName]];
+      currentQueue = currentQueue.filter(({ id }) => (id !== actionID));
+      actionQueue[queueName] = currentQueue;
     } else {
       console.log(`${'services'.yellow}/actionMachine.js - ${'removeFromActionQueue'.cyan} - ${queueName} does not exist`);
     }
@@ -76,6 +76,7 @@
               addToCallCount();
               actions[name](params, () => {
                 actionMachine.removeFromActionQueue(queueName, id);
+                subtractFromCallCount();
               }, () => {
                 actionMachine.updateActionInQueue(queueName, id, { isRunning: false });
                 subtractFromCallCount();
@@ -92,8 +93,6 @@
         } else {
           console.log(` Action: ${name} is not bound to actions `.bgWhite.red);
         }
-      } else {
-        actionMachine.removeFromActionQueue(queueName, id);
       }
     } catch (err) {
       console.log(`${'services'.yellow}/actionMachine.js - ${'runAction'.cyan} - ${err.toString().red}`);
@@ -111,11 +110,7 @@
       }
 
       actionQueue[queueName].forEach(actionObj => {
-        if (/* check has hardware resources */true) {
-          actionMachine.runAction(queueName, actionObj);
-        } else {
-          return;
-        }
+        actionMachine.runAction(queueName, actionObj);
       });
     } catch (err) {
       console.log(`${'services'.yellow}/actionMachine.js - ${'runActionQueue'.cyan} - ${err.toString().red}`);

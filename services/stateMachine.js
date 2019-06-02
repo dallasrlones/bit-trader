@@ -46,39 +46,54 @@
     const spread = parseFloat((closeoutAsk - closeoutBid) / closeoutAsk * 100).toFixed(3);
 
     if(mostRecentPrices[instrument] === undefined) {
-      mostRecentPrices[instrument] = [pricingObj];
+      mostRecentPrices[instrument] = [];
+      mostRecentPrices[instrument].unshift(pricingObj);
     } else {
       mostRecentPrices[instrument].unshift(pricingObj);
 
-      if (mostRecentPrices[instrument].length > 5) {
+      // 5 seconsd candles (5 * 5)
+      if (mostRecentPrices[instrument].length > (5 * 5)) {
+        console.log(mostRecentPrices[instrument]);
+        console.log('REMOVING CANDLE');
+        process.exit(1)
         mostRecentPrices[instrument].pop();
       }
 
-      if (mostRecentPrices[instrument].length === 5 && candles[instrument] !== undefined) {
+      if (mostRecentPrices[instrument].length === (5 * 5) && candles[instrument] !== undefined) {
         const currentPrices = mostRecentPrices[instrument];
 
+        console.log('HIT');
+        console.log(currentPrices);
+        process.exit(1)
+
         const customCandle = currentPrices.reduce((results, customPriceObj) => {
-          if (parseFloat(results.bid.h) < parseFloat(customPriceObj.closeoutBid)) {
-            results.bid.h = customPriceObj.bid.h;
+          const newResults = { ...results };
+          if (parseFloat(newResults.bid.h) < parseFloat(customPriceObj.closeoutBid)) {
+            console.log('hit 1');
+            newResults.bid.h = customPriceObj.bid.h;
           }
 
-          if (parseFloat(results.bid.l) > parseFloat(customPriceObj.closeoutBid)) {
-            results.bid.l = customPriceObj.closeoutBid;
+          if (parseFloat(newResults.bid.l) > parseFloat(customPriceObj.closeoutBid)) {
+            console.log('hit 2');
+            newResults.bid.l = customPriceObj.closeoutBid;
           }
 
-          if (parseFloat(results.ask.h) < parseFloat(customPriceObj.closeoutAsk)) {
-            results.ask.h = customPriceObj.ask.h;
+          if (parseFloat(newResults.ask.h) < parseFloat(customPriceObj.closeoutAsk)) {
+            console.log('hit 3');
+            newResults.ask.h = customPriceObj.ask.h;
           }
 
-          if (parseFloat(results.ask.l) > parseFloat(customPriceObj.closeoutAsk)) {
-            results.ask.l = customPriceObj.ask.l;
+          if (parseFloat(newResults.ask.l) > parseFloat(customPriceObj.closeoutAsk)) {
+            console.log('hit 4');
+            newResults.ask.l = customPriceObj.ask.l;
           }
 
           if (customPriceObj.closeoutBid !== closeoutBid){
-            results.volume += 1;
+            console.log('hit 5');
+            newResults.volume += 1;
           }
 
-          return results;
+          return results = newResults;
         },
         {
           time,
