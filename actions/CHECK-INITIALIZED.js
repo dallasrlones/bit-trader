@@ -30,6 +30,7 @@
                 friendlyAlert(' CHECKING FOR PROFIT LOSS AND POSSIBLE TRADES ');
                 playSoundInstant('initialized.mp3', () => {
                   playSoundInstant('init_ai.mp3');
+                  setState('OANDA-HYDRATED', true);
                 });
               });
             });

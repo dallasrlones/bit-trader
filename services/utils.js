@@ -85,6 +85,7 @@
         if ( parseInt(i) < candlesArray.length - 1) {
           const lastCandle = candlesArray[parseInt(i) + 1];
           const currentCandle = candlesArray[i];
+
           const newAvgObj = {
             volume: currentCandle.volume,
             time: new Date(currentCandle.time).getTime(),
@@ -99,8 +100,6 @@
 
             bidLowVelocity: utils.getPipChange(lastCandle.bid.l, currentCandle.bid.l),
             bidHighVelocity: utils.getPipChange(lastCandle.bid.h, currentCandle.bid.h),
-            midLowVelocity: utils.getPipChange(lastCandle.mid.l, currentCandle.mid.l),
-            midHighVelocity: utils.getPipChange(lastCandle.mid.h, currentCandle.mid.h),
             askLowVelocity: utils.getPipChange(lastCandle.ask.l, currentCandle.ask.l),
             askHighVelocity: utils.getPipChange(lastCandle.ask.h, currentCandle.ask.h)
           };
@@ -112,8 +111,7 @@
         return new Date(a.time).getTime() > (new Date(b.time).getTime());
       });
     } catch (err) {
-      console.log('UTILS - generateInstrumentAvgs');
-      console.log(err);
+      handleError('generateInstrumentAvgs', err);
     }
   };
 
