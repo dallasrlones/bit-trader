@@ -12,16 +12,17 @@
 
     try {
 
-      // minus 200 because each pricing itteration is 200 millis
-      // mins 15 mins
       const lastTime = getLatestCustomCandleOpenTime(name);
       if (lastTime === false) {
         return retry();
       }
-      const fromDate =  parseFloat(lastTime - 200 - (1000 * 60 * 15));
+
+      // minus 900 some how magically equals 15 mins
+      const fromDate =  parseFloat(new Date(new Date(parseFloat(lastTime) * 1000).getTime() - 200 - (1000 * 60 * 15)).getTime() / 1000);
+      //console.log(fromDate);
 
       setState(`INITIALIZING-${name}-COUNT`, 1);
-      addToActionQueue('INSTANT', { name: 'INITIALIZE-INSTRUMENT-SHARD', params: { name, fromDate, limit: 181 }, hasAjax: true });
+      addToActionQueue('INSTANT', { name: 'INITIALIZE-INSTRUMENT-SHARD', params: { name, fromDate: lastTime, limit: 180 }, hasAjax: true });
       done();
     } catch (err) {
       handleError(err);

@@ -6,7 +6,6 @@
     headers: {
       'Authorization': oandaAuthHeader,
       'Content-Type': 'application/json',
-      // 'alignmentTimezone': alignmentTimezone,
       'Accept-Datetime-Format': 'UNIX'
     }
   });
@@ -44,8 +43,6 @@
           handleError('fetchAccount', err, reject);
         });
     });
-    // accounts also hold positions / balance
-    // positions contain current trades including profit loss and fees charged
   };
 
   // gets the instruments you can legally trade with
@@ -68,9 +65,8 @@
       client.get(`/accounts/${accountId}/pricing`, {
         params: { instruments: instrumentsArray.join(',')
       } })
-        .then(({ data }) => {
+        .then(({ data: { prices } }) => {
           setState('ONLINE', true);
-          const { prices } = data;
           resolve(prices);
         })
         .catch((err) => {
@@ -99,8 +95,10 @@
         params: {
           price: 'BA',
           granularity,
-          // FIX LATER
-          from,
+          // FIX
+          to: from,
+          //from,
+          //to: new Date(new Date(from * 1000).getTime() - 200 - (1000 * 60 * 15) / 1000).getTime().toFixed(0)
           count,
         }
       })

@@ -40,9 +40,9 @@
   //   return apiBank[apiName].fetchCurrentOrders(accountId);
   // };
 
-  traderMachine.fetchTickDataFrom = (apiName, currencyPair, fromDate, count) => {
+  traderMachine.fetchTickDataFrom = (apiName, currencyPair, fromDate, count, to) => {
     checkExistsInAPIBank(apiName);
-    return apiBank[apiName].fetchTickDataFrom(currencyPair, fromDate, count);
+    return apiBank[apiName].fetchTickDataFrom(currencyPair, fromDate, count, to);
   };
 
   // traderMachine.fetchYearsTickData = apiName => {

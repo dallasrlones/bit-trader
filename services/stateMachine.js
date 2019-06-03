@@ -8,7 +8,7 @@
   let mostRecentPrices = {};
   let turningOnline = false;
 
-  stateMachine.setState = (stateName, value) => {
+  function checkOnline(stateName, value) {
     if (stateName === 'ONLINE' && value === true && state['ONLINE'] === false && turningOnline === false) {
         turningOnline = true;
         friendlyAlert(' SYSTEM ONLINE - DETECTING MARKET ');
@@ -18,7 +18,10 @@
           turningOnline = false;
         });
     }
+  };
 
+  stateMachine.setState = (stateName, value) => {
+    checkOnline(stateName, value);
     state[stateName] = value;
   };
 
@@ -61,6 +64,9 @@
   };
 
   stateMachine.getLatestCustomCandleOpenTime = (name) => {
+    if (mostRecentPrices[name] === undefined) {
+      return false;
+    }
     return mostRecentPrices[name][mostRecentPrices[name].length - 1].time || false;
   };
 
@@ -74,35 +80,38 @@
       } else {
         mostRecentPrices[instrument].unshift(pricingObj);
 
-        // 5 seconsd candles (5 * 5)
-        if (mostRecentPrices[instrument].length > (5 * 5)) {
-          mostRecentPrices[instrument].pop();
-        }
+        const fullCandleLength = 5 * 5;
+        // 5 second candles (5 fetch loops in 1 second * 5)
+        const lastCandlesCloseBid = mostRecentPrices[instrument].closeoutBid;
 
-        if (mostRecentPrices[instrument].length === (5 * 5) && candles[instrument] !== undefined) {
+        if (mostRecentPrices[instrument].length === fullCandleLength && candles[instrument] !== undefined) {
           const currentPrices = mostRecentPrices[instrument];
 
-          const customCandle = currentPrices.reduce((results, customPriceObj) => {
+          const customCandle = currentPrices.reduce((results, currentPriceObj) => {
             const newResults = { ...results };
 
-
-            if (parseFloat(newResults.bid.h) < parseFloat(customPriceObj.closeoutBid)) {
-              newResults.bid.h = customPriceObj.closeoutBid;
+            if (parseFloat(newResults.bid.h) < parseFloat(currentPriceObj.closeoutBid)) {
+              console.log('hit 1');
+              newResults.bid.h = currentPriceObj.closeoutBid;
             }
 
-            if (parseFloat(newResults.bid.l) > parseFloat(customPriceObj.closeoutBid)) {
-              newResults.bid.l = customPriceObj.closeoutBid;
+            if (parseFloat(newResults.bid.l) > parseFloat(currentPriceObj.closeoutBid)) {
+              console.log('hit 2');
+              newResults.bid.l = currentPriceObj.closeoutBid;
             }
 
-            if (parseFloat(newResults.ask.h) < parseFloat(customPriceObj.closeoutAsk)) {
-              newResults.ask.h = customPriceObj.closeoutAsk;
+            if (parseFloat(newResults.ask.h) < parseFloat(currentPriceObj.closeoutAsk)) {
+              console.log('hit 3');
+              newResults.ask.h = currentPriceObj.closeoutAsk;
             }
 
-            if (parseFloat(newResults.ask.l) > parseFloat(customPriceObj.closeoutAsk)) {
-              newResults.ask.l = customPriceObj.closeoutAsk;
+            if (parseFloat(newResults.ask.l) > parseFloat(currentPriceObj.closeoutAsk)) {
+              console.log('hit 4');
+              newResults.ask.l = currentPriceObj.closeoutAsk;
             }
 
-            if (customPriceObj.closeoutBid !== closeoutBid){
+            if (currentPriceObj.closeoutBid !== closeoutBid){
+              console.log('hit 5');
               newResults.volume += 1;
             }
 
@@ -110,10 +119,15 @@
           },
           {
             time,
-            volume: 0,
-            bid: { o: currentPrices[4].closeoutBid, h: currentPrices[4].closeoutBid, l: currentPrices[4].closeoutBid, c: currentPrices[0].closeoutBid },
-            ask: { o: currentPrices[4].closeoutAsk, h: currentPrices[4].closeoutAsk, l: currentPrices[4].closeoutAsk, c: currentPrices[0].closeoutAsk }
+            volume: currentPrices[fullCandleLength -1].closeoutBid === lastCandlesCloseBid ? 0 : 1,
+            bid: { o: currentPrices[fullCandleLength -1].closeoutBid, h: currentPrices[fullCandleLength -1].closeoutBid, l: currentPrices[fullCandleLength -1].closeoutBid, c: currentPrices[0].closeoutBid },
+            ask: { o: currentPrices[fullCandleLength -1].closeoutAsk, h: currentPrices[fullCandleLength -1].closeoutAsk, l: currentPrices[fullCandleLength -1].closeoutAsk, c: currentPrices[0].closeoutAsk }
           });
+
+          console.log(customCandle);
+
+          console.log(candles[instrument][candles[instrument].length - 1]);
+          process.exit(1)
 
           candles[instrument].unshift(customCandle);
           candles[instrument].pop();
@@ -132,22 +146,13 @@
   };
 
   stateMachine.addToInstrumentCandles = (name, newData) => {
-    // CHANGE LATER to join
+    // CHANGE LATER to join for larger sets
     try {
       candles[name] = newData;
     } catch (err) {
       stateMachineError('addToInstrumentCandles', err);
     }
   };
-
-  // custom current candles
-
-  stateMachine.addToCustomCandles = priceObj => {
-    // unshift
-    // pop
-  };
-
-  // candles initial load
 
   stateMachine.getInstrumentCandles = name => {
     return candles[name];

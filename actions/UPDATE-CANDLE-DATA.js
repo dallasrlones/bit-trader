@@ -19,7 +19,6 @@
       const instrumentsArray = getState('OANDA-AVAILABLE-INSTRUMENTS');
 
       instrumentsArray.forEach(({ name }) => {
-        // getState(customcandles) [length] time - 200 milliseconds (fetch loop time)
         addToActionQueue('INSTANT', { name: 'INITIALIZE-INSTRUMENT', params: { name } });
       });
       done();
