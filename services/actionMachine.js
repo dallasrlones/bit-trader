@@ -93,9 +93,10 @@
               actionMachine.updateActionInQueue(queueName, id, { isRunning: false });
             }
           } else {
-            //console.log('no ajax');
             actions[name](params, () => {
               actionMachine.removeFromActionQueue(queueName, id);
+            }, () => {
+              actionMachine.updateActionInQueue(queueName, id, { isRunning: false });
             });
           }
         } else {

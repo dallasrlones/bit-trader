@@ -19,6 +19,8 @@
 
           if (candlesArray.length !== limit) {
             handleError('response candles array not the requested limit length');
+            console.log(candlesArray);
+            process.exit(1)
             retry();
           }
 

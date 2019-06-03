@@ -19,8 +19,10 @@
       if (getState('OANDA-AVAILABLE-INSTRUMENTS') === undefined) {
         addToActionQueue('INSTANT', { name: 'UPDATE-AVAILABLE-INSTRUMENTS', hasAjax: true });
         setTimeout(() => {
-          addToActionQueue('FETCH', { name: 'FIRST-RUN', hasAjax: true });
           startFetchQueue(fetchQueueIntervalSpeed);
+          setTimeout(() => {
+            addToActionQueue('FETCH', { name: 'UPDATE-CANDLE-DATA' });
+          }, 1000);
         }, 2000);
       }
     }

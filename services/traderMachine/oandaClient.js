@@ -100,7 +100,7 @@
           price: 'BA',
           granularity,
           // FIX LATER
-          //from,
+          from,
           count,
         }
       })

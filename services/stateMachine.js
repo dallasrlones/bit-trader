@@ -5,19 +5,18 @@
   let avgs = {};
   let buys = {};
   let profitLosses = {};
-  const mostRecentPrices = {};
+  let mostRecentPrices = {};
+  let turningOnline = false;
 
   stateMachine.setState = (stateName, value) => {
-    if (stateName === 'ONLINE' && value === true && state['ONLINE'] === false) {
+    if (stateName === 'ONLINE' && value === true && state['ONLINE'] === false && turningOnline === false) {
+        turningOnline = true;
+        friendlyAlert(' SYSTEM ONLINE - DETECTING MARKET ');
         addToSoundQueueTop('reconnected.mp3', () => {
           addToSoundQueueTop('updating_to_current.mp3');
+          require('./actionMachine').addToActionQueue('INSTANT', { name: 'UPDATE-CANDLE-DATA' });
+          turningOnline = false;
         });
-        friendlyAlert(' SYSTEM ONLINE - DETECTING MARKET ');
-
-        setTimeout(() => {
-          friendlyAlert(' SYSTEM ONLINE - DETECTING MARKET ');
-        }, 5000);
-        // TO-DO: catch candles up to current time
     }
 
     state[stateName] = value;
@@ -55,6 +54,14 @@
 
   stateMachine.removeFromBuys = (instrumentName) => {
     delete buys[instrumentName];
+  };
+
+  stateMachine.clearCustomCandles = () => {
+    mostRecentPrices = {};
+  };
+
+  stateMachine.getLatestCustomCandleOpenTime = (name) => {
+    return mostRecentPrices[name][mostRecentPrices[name].length - 1].time || false;
   };
 
   stateMachine.setInstrumentPriceAndSpread = (pricingObj) => {
@@ -110,6 +117,7 @@
 
           candles[instrument].unshift(customCandle);
           candles[instrument].pop();
+          mostRecentPrices[instrument] = [];
         }
       }
 

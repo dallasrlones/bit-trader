@@ -1,4 +1,4 @@
-((errorHandlers, { playSound }, { danger, warning }) => {
+((errorHandlers, { playSound }, { danger, warning }, actionMachine) => {
 
   function playError() {
     playSound('error.mp3');
@@ -23,7 +23,9 @@
       return reject('');
     } else if (err.errno === 'ENOTFOUND' || err.errno === 'ENETUNREACH' || err.errno === 'EADDRNOTAVAIL') {
       danger(' CONNECTION LOST ');
-      require('./stateMachine').setState('ONLINE', false);
+      const { setState, clearCustomCandles } = require('./stateMachine');
+      setState('ONLINE', false);
+      clearCustomCandles();
       setTimeout(() => {
         playSound('cant_find_source.mp3', undefined, 2500);
       }, 1000);
@@ -66,5 +68,6 @@
   {},
   require('./soundService'),
   require('./utils'),
+  require('./actionMachine'),
   require('colors')
 );

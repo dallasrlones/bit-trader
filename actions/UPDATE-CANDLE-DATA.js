@@ -1,11 +1,11 @@
 (({ actionMachine, stateMachine, utils, soundService, errorHandlers }) => {
-  const { getState } = stateMachine;
+  const { getState, setState } = stateMachine;
   const { friendlyAlert } = utils;
   const { actionsError } = errorHandlers;
   const { addToSoundQueue } = soundService;
 
   function handleError (err) {
-    actionsError('FIRST-RUN', err);
+    actionsError('UPDATE-CANDLE-DATA', err);
   }
 
   module.exports = (params, done) => {
@@ -13,11 +13,13 @@
 
     try {
       addToSoundQueue('init.mp3');
-      friendlyAlert(' INITIALIZING DATA SET ');
+      friendlyAlert(' INITIALIZING CANDLES DATA SET ');
+      setState('OANDA-INITIALIZED-STATES', {});
 
       const instrumentsArray = getState('OANDA-AVAILABLE-INSTRUMENTS');
 
       instrumentsArray.forEach(({ name }) => {
+        // getState(customcandles) [length] time - 200 milliseconds (fetch loop time)
         addToActionQueue('INSTANT', { name: 'INITIALIZE-INSTRUMENT', params: { name } });
       });
       done();

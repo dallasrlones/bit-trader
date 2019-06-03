@@ -1,5 +1,5 @@
 (({ stateMachine, actionMachine, utils, errorHandlers }) => {
-  const { getState, setState } = stateMachine;
+  const { getState, setState, getLatestCustomCandleOpenTime } = stateMachine;
   const { friendlyAlert } = utils;
   const { actionsError } = errorHandlers;
 
@@ -7,31 +7,21 @@
     actionsError('INITIALIZE-INSTRUMENT', err);
   }
 
-  module.exports = ({ name }, done) => {
+  module.exports = ({ name }, done, retry) => {
     const { addToActionQueue } = actionMachine;
 
     try {
-      // 900 seconds
-      const timeBack = (1000 * 60 * 15) + 5000;
-      // start date divided by 5 second intervals devided by 5k max limit on API call
-      const itterations = Math.ceil(timeBack / 5000 / 5000);
 
-      // friendlyAlert(` SETTING - ${name} - COUNT `);
-      setState('OANDA-INITIALIZED-STATES', {});
-      setState(`INITIALIZING-${name}-COUNT`, itterations);
-
-      if (itterations > 1) {
-        for (var i = 0; i <= itterations; i++) {
-          const fromDate = new Date(new Date().getTime() - (i + 1) / itterations).toISOString();
-          addToActionQueue('INSTANT', { name: 'INITIALIZE-INSTRUMENT-SHARD', params: { name, fromDate }, hasAjax: true });
-        }
-      } else {
-        const fromDate = new Date(
-          new Date(new Date().toLocaleString("en-US", {timeZone: "America/Denver"})) - timeBack
-        ).toISOString();
-
-        addToActionQueue('INSTANT', { name: 'INITIALIZE-INSTRUMENT-SHARD', params: { name, fromDate, limit: (timeBack / 1000 / 5) }, hasAjax: true });
+      // minus 200 because each pricing itteration is 200 millis
+      // mins 15 mins
+      const lastTime = getLatestCustomCandleOpenTime(name);
+      if (lastTime === false) {
+        return retry();
       }
+      const fromDate =  parseFloat(lastTime - 200 - (1000 * 60 * 15));
+
+      setState(`INITIALIZING-${name}-COUNT`, 1);
+      addToActionQueue('INSTANT', { name: 'INITIALIZE-INSTRUMENT-SHARD', params: { name, fromDate, limit: 181 }, hasAjax: true });
       done();
     } catch (err) {
       handleError(err);
