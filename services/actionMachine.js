@@ -79,7 +79,6 @@
                 subtractFromCallCount();
               }, () => {
                 actionMachine.updateActionInQueue(queueName, id, { isRunning: false });
-                subtractFromCallCount();
               });
             } else {
               actionMachine.updateActionInQueue(queueName, id, { isRunning: false });

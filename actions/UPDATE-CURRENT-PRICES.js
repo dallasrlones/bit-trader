@@ -24,7 +24,6 @@
       )
         .then((pricingArray) => {
           pricingArray.forEach((pricingObj) => {
-            console.log(new Date(pricingObj.time).getTime());
             setInstrumentPriceAndSpread(pricingObj);
           });
           done();

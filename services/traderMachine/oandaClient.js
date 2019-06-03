@@ -1,12 +1,13 @@
-((oandaClient, axios, { baseOandaUrl, oandaAuthHeader }) => {
+((oandaClient, axios, { baseOandaUrl, oandaAuthHeader }, { playSound }) => {
   const alignmentTimezone = 'America/Denver';
   const client = axios.create({
     baseURL: `${baseOandaUrl}/v3`,
-    timeout: 1000 * 10,
+    timeout: 1000 * 5,
     headers: {
       'Authorization': oandaAuthHeader,
       'Content-Type': 'application/json',
-      'alignmentTimezone': alignmentTimezone
+      // 'alignmentTimezone': alignmentTimezone,
+      'Accept-Datetime-Format': 'UNIX'
     }
   });
   const granularity = 'S5';
@@ -14,12 +15,21 @@
 
   function handleError(methodName, err, reject) {
     console.log(`${'oandaClient'.yellow} - ${methodName.toString().green} - ${err.toString().red}`);
-    if (err.toString() === 'Error: read ECONNRESET') {
+    if (
+      err.toString() === 'Error: read ECONNRESET' ||
+      err.toString() === 'Error: timeout of 5000ms exceeded'
+    ) {
       console.log(' INTERNET SHIT THE BED ');
+      playSound('connection_unstable.mp3', undefined, 1500);
+      return reject('');
+    } else if (err.toString() === 'Error: getaddrinfo ENOTFOUND api-fxpractice.oanda.com') {
+      setTimeout(() => {
+        playSound('cant_find_source.mp3', undefined, 2500);
+      }, 1000);
+      return reject('');
     } else {
       console.log(err);
     }
-
     reject(err);
   }
 
@@ -67,7 +77,9 @@
 
   oandaClient.fetchCurrentPricingForInstruments = (accountId, instrumentsArray) => {
     return new Promise((resolve, reject) => {
-      client.get(`/accounts/${accountId}/pricing`, { params: { instruments: instrumentsArray.join(',') } })
+      client.get(`/accounts/${accountId}/pricing`, {
+        params: { instruments: instrumentsArray.join(',')
+      } })
         .then(({ data }) => {
           const { prices } = data;
           resolve(prices);
@@ -153,6 +165,6 @@
   module.exports,
   require('axios'),
   require('../../config'),
-  require('../index'),
+  require('../soundService'),
   require('colors')
 );

@@ -15,11 +15,11 @@
   function timePassedClose(){
     return (new Date(
       new Date().toLocaleString("en-US", {timeZone: "America/New_York"})
-    ).getHours() >= 15);
+    ).getHours() >= 17);
   }
 
   function isTradingOpen() {
-    if (dayIs(0) || (dayIs(5) ) || dayIs(6)) {
+    if ((dayIs(0) || (dayIs(5) ) || dayIs(6)) && timePassedClose() === false) {
       if(tradingOpenPlayed === false) {
         tradingOpenPlayed = true;
         setState('MARKET-IS-OPEN', false);

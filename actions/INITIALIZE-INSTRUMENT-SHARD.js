@@ -32,13 +32,13 @@
           done();
         })
         .catch((err) => {
+          setState(`INITIALIZING-${name}-COUNT`, (getState(`INITIALIZING-${name}-COUNT`) + 1));
           handleError(err);
           retry();
         });
 
     } catch (err) {
       handleError(err);
-      retry();
     }
   };
 

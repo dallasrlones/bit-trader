@@ -53,43 +53,33 @@
 
       // 5 seconsd candles (5 * 5)
       if (mostRecentPrices[instrument].length > (5 * 5)) {
-        console.log(mostRecentPrices[instrument]);
-        console.log('REMOVING CANDLE');
-        process.exit(1)
         mostRecentPrices[instrument].pop();
       }
 
       if (mostRecentPrices[instrument].length === (5 * 5) && candles[instrument] !== undefined) {
         const currentPrices = mostRecentPrices[instrument];
 
-        console.log('HIT');
-        console.log(currentPrices);
-        process.exit(1)
-
         const customCandle = currentPrices.reduce((results, customPriceObj) => {
           const newResults = { ...results };
+
+
           if (parseFloat(newResults.bid.h) < parseFloat(customPriceObj.closeoutBid)) {
-            console.log('hit 1');
-            newResults.bid.h = customPriceObj.bid.h;
+            newResults.bid.h = customPriceObj.closeoutBid;
           }
 
           if (parseFloat(newResults.bid.l) > parseFloat(customPriceObj.closeoutBid)) {
-            console.log('hit 2');
             newResults.bid.l = customPriceObj.closeoutBid;
           }
 
           if (parseFloat(newResults.ask.h) < parseFloat(customPriceObj.closeoutAsk)) {
-            console.log('hit 3');
-            newResults.ask.h = customPriceObj.ask.h;
+            newResults.ask.h = customPriceObj.closeoutAsk;
           }
 
           if (parseFloat(newResults.ask.l) > parseFloat(customPriceObj.closeoutAsk)) {
-            console.log('hit 4');
-            newResults.ask.l = customPriceObj.ask.l;
+            newResults.ask.l = customPriceObj.closeoutAsk;
           }
 
           if (customPriceObj.closeoutBid !== closeoutBid){
-            console.log('hit 5');
             newResults.volume += 1;
           }
 
