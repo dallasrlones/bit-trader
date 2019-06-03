@@ -62,15 +62,18 @@
   const soundQueue = [];
   let soundQueueIsPlaying = false;
 
-  function play(name) {
+  function play(name, cb) {
     soundQueueIsPlaying = true;
     soundService.playSoundInstant(name, () => {
       soundQueueIsPlaying = false;
+      if (cb !== undefined) {
+        cb();
+      }
     });
   }
 
-  soundService.addToSoundQueue = (fileLocation) => {
-    soundQueue.push(fileLocation);
+  soundService.addToSoundQueue = (fileLocation, cb) => {
+    soundQueue.push(cb !== undefined ? [fileLocation, cb] : fileLocation);
   };
 
   soundService.addToSoundQueueTop = (fileLocation) => {
@@ -80,7 +83,13 @@
   soundService.runSoundQueue = () => {
     try {
       if (soundQueue.length > 0 && soundQueueIsPlaying === false) {
-        play(soundQueue[0]);
+        if (Array.isArray(soundQueue[0])) {
+          const [name, cb] = soundQueue[0];
+          play(name, cb);
+        } else {
+          play(soundQueue[0]);
+        }
+
         soundQueue.shift();
       }
     } catch (err) {

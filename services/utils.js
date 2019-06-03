@@ -1,4 +1,4 @@
-((utils, Spinner, { getState }) => {
+((utils, Spinner, { getState }, { utilsError }) => {
 
   var spinner = new Spinner({
     text: 'INITIALIZING '.cyan,
@@ -11,27 +11,23 @@
   spinner.setSpinnerString(22);
   spinner.start();
 
-  spinner.setSpinnerTitle(' DATA SET HYDRATED '.cyan)
-
   function handleError(methodName, err){
-    console.log(`${'utils'.yellow} - ${methodName} - ${err.toString().red}`);
-    console.log(err);
-    process.exit(1)
+    utilsError(methodName, err);
   }
 
   utils.friendlyAlert = message => {
-    //console.log(message.toString().bgWhite.blue);
     spinner.setSpinnerTitle(` ${message} `.cyan);
+    spinner.setSpinnerString(22);
   };
 
-  utils.alert = message => {
-    //console.log(message.toString().bgWhite.blue);
+  utils.danger = message => {
     spinner.setSpinnerTitle(` ${message} `.bgRed.black);
+    spinner.setSpinnerString(8);
   };
 
   utils.warning = message => {
-    //console.log(message.toString().bgWhite.blue);
     spinner.setSpinnerTitle(` ${message} `.bgYellow.black);
+    spinner.setSpinnerString(7);
   };
 
   utils.getAverage = arr => arr.reduce( ( p, c ) => parseFloat(p) + parseFloat(c), 0 ) / arr.length;

@@ -20,24 +20,18 @@
   }
 
   function isTradingOpen() {
-    if ((dayIs(0) || (dayIs(5) ) || dayIs(6)) && timePassedClose() === false) {
+    if (true/*(dayIs(0) || (dayIs(5) ) || dayIs(6)) && timePassedClose() === false*/) {
       if(tradingOpenPlayed === false) {
         tradingOpenPlayed = true;
         setState('MARKET-IS-OPEN', false);
-
-        setTimeout(() => {
-          addToSoundQueueTop('market_closed.mp3');
-          warning('MARKET IS CLOSED'.red);
-        }, 1000 * 30);
+        addToSoundQueueTop('market_closed.mp3');
+        warning('MARKET IS CLOSED');
       }
     } else {
       if (tradingOpenPlayed === true) {
         tradingOpenPlayed = false;
         setState('MARKET-IS-OPEN', true);
-
-        setTimeout(() => {
-          addToSoundQueueTop('market_open.mp3');
-        }, 1000 * 30)
+        addToSoundQueueTop('market_open.mp3');
       }
     }
   }
@@ -49,7 +43,7 @@
       if (getState('OANDA-ACCOUNT-PRIMARY') !== undefined) {
         addToActionQueue('INSTANT', { name: 'CHECK-FOR-PROFIT-LOSS' });
 
-        if (getState('OANDA-HYDRATED') !== undefined) {
+        if (getState('OANDA-HYDRATED')) {
           addToActionQueue('INSTANT', { name: 'UPDATE-AVERAGES' });
           addToActionQueue('INSTANT', { name: 'CHECK-FOR-SURGE' });
         }

@@ -22,14 +22,17 @@
 
         if (getState('OANDA-AVAILABLE-INSTRUMENTS').length === Object.keys(getState('OANDA-INITIALIZED-STATES') || { }).length) {
           friendlyAlert(' HISTORY HYDRATED ');
-          addToSoundQueue('data_set_hydrated.mp3');
-          friendlyAlert(' UPDATING TO CURRENT CANDLES ');
-          addToSoundQueue('updating_to_current.mp3');
-          friendlyAlert(' FULLY HYDRATED ');
-          addToSoundQueue('candles_up_to_date.mp3');
-          friendlyAlert(' CHECKING FOR PROFIT LOSS AND POSSIBLE TRADES ');
-          addToSoundQueue('initialized.mp3');
-          addToSoundQueue('init_ai.mp3');
+          addToSoundQueue('data_set_hydrated.mp3', () => {
+            friendlyAlert(' UPDATING TO CURRENT CANDLES ');
+            addToSoundQueue('updating_to_current.mp3', () => {
+              friendlyAlert(' FULLY HYDRATED ');
+              addToSoundQueue('candles_up_to_date.mp3', () => {
+                friendlyAlert(' CHECKING FOR PROFIT LOSS AND POSSIBLE TRADES ');
+                addToSoundQueue('initialized.mp3');
+              });
+            });
+          });
+          
           setState('OANDA-HYDRATED', true);
         }
       }
