@@ -1,4 +1,4 @@
-((oandaClient, axios, { baseOandaUrl, oandaAuthHeader }, { playSound }) => {
+((oandaClient, axios, { baseOandaUrl, oandaAuthHeader }, { setState }, { ajaxError }) => {
   const alignmentTimezone = 'America/Denver';
   const client = axios.create({
     baseURL: `${baseOandaUrl}/v3`,
@@ -12,31 +12,17 @@
   });
   const granularity = 'S5';
 
+  let linkEstablished = true;
 
   function handleError(methodName, err, reject) {
-    console.log(`${'oandaClient'.yellow} - ${methodName.toString().green} - ${err.toString().red}`);
-    if (
-      err.toString() === 'Error: read ECONNRESET' ||
-      err.toString() === 'Error: timeout of 5000ms exceeded'
-    ) {
-      console.log(' INTERNET SHIT THE BED ');
-      playSound('connection_unstable.mp3', undefined, 1500);
-      return reject('');
-    } else if (err.toString() === 'Error: getaddrinfo ENOTFOUND api-fxpractice.oanda.com') {
-      setTimeout(() => {
-        playSound('cant_find_source.mp3', undefined, 2500);
-      }, 1000);
-      return reject('');
-    } else {
-      console.log(err);
-    }
-    reject(err);
+    ajaxError(methodName, err, reject);
   }
 
   oandaClient.fetchAccountIds = () => {
     return new Promise((resolve, reject) => {
       client.get('/accounts')
         .then(({ data }) => {
+          setState('ONLINE', true);
           const { accounts } = data;
           resolve(accounts);
         })
@@ -50,6 +36,7 @@
     return new Promise((resolve, reject) => {
       client.get(`/accounts/${accountId}`)
         .then(({ data }) => {
+          setState('ONLINE', true);
           const { account } = data;
           resolve(account);
         })
@@ -66,6 +53,7 @@
     return new Promise((resolve, reject) => {
       client.get(`/accounts/${accountId}/instruments`)
         .then(({ data }) => {
+          setState('ONLINE', true);
           const { instruments } = data;
           resolve(instruments);
         })
@@ -81,6 +69,7 @@
         params: { instruments: instrumentsArray.join(',')
       } })
         .then(({ data }) => {
+          setState('ONLINE', true);
           const { prices } = data;
           resolve(prices);
         })
@@ -95,6 +84,7 @@
     return new Promise((resolve, reject) => {
       client.get(`/accounts/${accountId}/orders`)
         .then(({ data }) => {
+          setState('ONLINE', true);
           resolve({ orders: data.orders });
         })
         .catch((err) => {
@@ -115,6 +105,7 @@
         }
       })
       .then(({ data }) => {
+        setState('ONLINE', true);
         const { candles } = data;
         resolve(candles);
       })
@@ -139,6 +130,7 @@
     return new Promise((resolve, reject) => {
       client.post(`/accounts/${accountId}/orders`, newOrder)
         .then(({ data }) => {
+          setState('ONLINE', true);
           resolve(data);
         })
         .catch((err) => {
@@ -152,6 +144,7 @@
     return new Promise((resolve, reject) => {
       client.put(`/accounts/${accountId}/trades/${tradeId}/close`)
         .then(({ data }) => {
+          setState('ONLINE', true);
           resolve(data);
         })
         .catch((err) => {
@@ -165,6 +158,7 @@
   module.exports,
   require('axios'),
   require('../../config'),
-  require('../soundService'),
+  require('../stateMachine'),
+  require('../errorHandlers'),
   require('colors')
 );

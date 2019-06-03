@@ -76,8 +76,8 @@
     soundQueue.push(cb !== undefined ? [fileLocation, cb] : fileLocation);
   };
 
-  soundService.addToSoundQueueTop = (fileLocation) => {
-    soundQueue.unshift(fileLocation);
+  soundService.addToSoundQueueTop = (fileLocation, cb) => {
+    soundQueue.unshift(cb !== undefined ? [fileLocation, cb] : fileLocation);
   };
 
   soundService.runSoundQueue = () => {

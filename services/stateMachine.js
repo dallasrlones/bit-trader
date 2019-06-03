@@ -1,4 +1,4 @@
-((stateMachine, { stateMachineError }) => {
+((stateMachine, { stateMachineError }, { addToSoundQueueTop }, { friendlyAlert }) => {
   let state = {};
   let prices = {};
   let candles = {};
@@ -8,6 +8,18 @@
   const mostRecentPrices = {};
 
   stateMachine.setState = (stateName, value) => {
+    if (stateName === 'ONLINE' && value === true && state['ONLINE'] === false) {
+        addToSoundQueueTop('reconnected.mp3', () => {
+          addToSoundQueueTop('updating_to_current.mp3');
+        });
+        friendlyAlert(' SYSTEM ONLINE - DETECTING MARKET ');
+
+        setTimeout(() => {
+          friendlyAlert(' SYSTEM ONLINE - DETECTING MARKET ');
+        }, 5000);
+        // TO-DO: catch candles up to current time
+    }
+
     state[stateName] = value;
   };
 
@@ -145,5 +157,7 @@
 })
 (
   {},
-  require('./errorHandlers')
+  require('./errorHandlers'),
+  require('./soundService'),
+  require('./utils')
 );

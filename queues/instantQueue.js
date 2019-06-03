@@ -20,7 +20,7 @@
   }
 
   function isTradingOpen() {
-    if (true/*(dayIs(0) || (dayIs(5) ) || dayIs(6)) && timePassedClose() === false*/) {
+    if ((dayIs(0) || (dayIs(5) ) || dayIs(6)) && timePassedClose() === false) {
       if(tradingOpenPlayed === false) {
         tradingOpenPlayed = true;
         setState('MARKET-IS-OPEN', false);
