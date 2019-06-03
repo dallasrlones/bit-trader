@@ -1,7 +1,8 @@
-(({ stateMachine, actionMachine, traderMachine, utils }) => {
+(({ stateMachine, actionMachine, traderMachine, utils, errorHandlers }) => {
   const { getState, setState, addToInstrumentCandles } = stateMachine;
   const { fetchTickDataFrom } = traderMachine;
-  const { actionsError, friendlyAlert } = utils;
+  const { friendlyAlert } = utils;
+  const { actionsError } = errorHandlers;
 
 
   function handleError(err) {
@@ -17,9 +18,7 @@
           setState(`INITIALIZING-${name}-COUNT`, (getState(`INITIALIZING-${name}-COUNT`) - 1));
 
           if (candlesArray.length !== limit) {
-            handleError('candles array not the limit length');
-            console.log(candlesArray.length);
-            process.exit(1)
+            handleError('response candles array not the requested limit length');
             retry();
           }
 

@@ -34,15 +34,6 @@
     spinner.setSpinnerTitle(` ${message} `.bgYellow.black);
   };
 
-  utils.actionsError = (actionName, err) => {
-    console.log(`${'actions'.green}/${actionName}.js - ${err.toString().red}`);
-    console.log(err);
-
-    if (err.toString() !== '') {
-      require('./index').playSound('error.mp3');
-    }
-  }
-
   utils.getAverage = arr => arr.reduce( ( p, c ) => parseFloat(p) + parseFloat(c), 0 ) / arr.length;
 
   utils.getPercentageChanged = (oldNumber, newNumber) => {

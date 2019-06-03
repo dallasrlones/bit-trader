@@ -1,4 +1,4 @@
-((stateMachine) => {
+((stateMachine, { stateMachineError }) => {
   let state = {};
   let prices = {};
   let candles = {};
@@ -16,16 +16,20 @@
   };
 
   stateMachine.checkSetGetHighestProfitLoss = (id, newProfitLossValue) => {
-    const currentHigh = profitLosses[id];
-    newProfitLossValue = parseFloat(newProfitLossValue);
-    if (currentHigh !== undefined) {
-      if (parseFloat(currentHigh) < newProfitLossValue) {
+    try {
+      const currentHigh = profitLosses[id];
+      newProfitLossValue = parseFloat(newProfitLossValue);
+      if (currentHigh !== undefined) {
+        if (parseFloat(currentHigh) < newProfitLossValue) {
+          profitLosses[id] = newProfitLossValue;
+        }
+      } else {
         profitLosses[id] = newProfitLossValue;
       }
-    } else {
-      profitLosses[id] = newProfitLossValue;
+      return profitLosses[id];
+    } catch (err) {
+      stateMachineError('checkSetGetHighestProfitLoss', err);
     }
-    return profitLosses[id];
   };
 
   stateMachine.addToBuys = (instrumentName) => {
@@ -42,62 +46,65 @@
   };
 
   stateMachine.setInstrumentPriceAndSpread = (pricingObj) => {
-    const { closeoutAsk, closeoutBid, instrument, time } = pricingObj;
-    const spread = parseFloat((closeoutAsk - closeoutBid) / closeoutAsk * 100).toFixed(3);
+    try {
+      const { closeoutAsk, closeoutBid, instrument, time } = pricingObj;
+      const spread = parseFloat((closeoutAsk - closeoutBid) / closeoutAsk * 100).toFixed(3);
 
-    if(mostRecentPrices[instrument] === undefined) {
-      mostRecentPrices[instrument] = [];
-      mostRecentPrices[instrument].unshift(pricingObj);
-    } else {
-      mostRecentPrices[instrument].unshift(pricingObj);
+      if(mostRecentPrices[instrument] === undefined) {
+        mostRecentPrices[instrument] = [pricingObj];
+      } else {
+        mostRecentPrices[instrument].unshift(pricingObj);
 
-      // 5 seconsd candles (5 * 5)
-      if (mostRecentPrices[instrument].length > (5 * 5)) {
-        mostRecentPrices[instrument].pop();
+        // 5 seconsd candles (5 * 5)
+        if (mostRecentPrices[instrument].length > (5 * 5)) {
+          mostRecentPrices[instrument].pop();
+        }
+
+        if (mostRecentPrices[instrument].length === (5 * 5) && candles[instrument] !== undefined) {
+          const currentPrices = mostRecentPrices[instrument];
+
+          const customCandle = currentPrices.reduce((results, customPriceObj) => {
+            const newResults = { ...results };
+
+
+            if (parseFloat(newResults.bid.h) < parseFloat(customPriceObj.closeoutBid)) {
+              newResults.bid.h = customPriceObj.closeoutBid;
+            }
+
+            if (parseFloat(newResults.bid.l) > parseFloat(customPriceObj.closeoutBid)) {
+              newResults.bid.l = customPriceObj.closeoutBid;
+            }
+
+            if (parseFloat(newResults.ask.h) < parseFloat(customPriceObj.closeoutAsk)) {
+              newResults.ask.h = customPriceObj.closeoutAsk;
+            }
+
+            if (parseFloat(newResults.ask.l) > parseFloat(customPriceObj.closeoutAsk)) {
+              newResults.ask.l = customPriceObj.closeoutAsk;
+            }
+
+            if (customPriceObj.closeoutBid !== closeoutBid){
+              newResults.volume += 1;
+            }
+
+            return results = newResults;
+          },
+          {
+            time,
+            volume: 0,
+            bid: { o: currentPrices[4].closeoutBid, h: currentPrices[4].closeoutBid, l: currentPrices[4].closeoutBid, c: currentPrices[0].closeoutBid },
+            ask: { o: currentPrices[4].closeoutAsk, h: currentPrices[4].closeoutAsk, l: currentPrices[4].closeoutAsk, c: currentPrices[0].closeoutAsk }
+          });
+
+          candles[instrument].unshift(customCandle);
+          candles[instrument].pop();
+        }
       }
 
-      if (mostRecentPrices[instrument].length === (5 * 5) && candles[instrument] !== undefined) {
-        const currentPrices = mostRecentPrices[instrument];
-
-        const customCandle = currentPrices.reduce((results, customPriceObj) => {
-          const newResults = { ...results };
-
-
-          if (parseFloat(newResults.bid.h) < parseFloat(customPriceObj.closeoutBid)) {
-            newResults.bid.h = customPriceObj.closeoutBid;
-          }
-
-          if (parseFloat(newResults.bid.l) > parseFloat(customPriceObj.closeoutBid)) {
-            newResults.bid.l = customPriceObj.closeoutBid;
-          }
-
-          if (parseFloat(newResults.ask.h) < parseFloat(customPriceObj.closeoutAsk)) {
-            newResults.ask.h = customPriceObj.closeoutAsk;
-          }
-
-          if (parseFloat(newResults.ask.l) > parseFloat(customPriceObj.closeoutAsk)) {
-            newResults.ask.l = customPriceObj.closeoutAsk;
-          }
-
-          if (customPriceObj.closeoutBid !== closeoutBid){
-            newResults.volume += 1;
-          }
-
-          return results = newResults;
-        },
-        {
-          time,
-          volume: 0,
-          bid: { o: currentPrices[4].closeoutBid, h: currentPrices[4].closeoutBid, l: currentPrices[4].closeoutBid, c: currentPrices[0].closeoutBid },
-          ask: { o: currentPrices[4].closeoutAsk, h: currentPrices[4].closeoutAsk, l: currentPrices[4].closeoutAsk, c: currentPrices[0].closeoutAsk }
-        });
-
-        candles[instrument].unshift(customCandle);
-        candles[instrument].pop();
-      }
+      prices[instrument] = { ...pricingObj, spread };
+    } catch (err) {
+      stateMachineError('setInstrumentPriceAndSpread', err);
     }
-
-    prices[instrument] = { ...pricingObj, spread };
   };
 
   stateMachine.getInstrumentPrice = name => {
@@ -105,13 +112,12 @@
   };
 
   stateMachine.addToInstrumentCandles = (name, newData) => {
-    // CHANGE LATER
-    if (!newData.length || newData.length === 0) {
-      console.log(name);
-      console.log(newData);
-      process.exit(1);
+    // CHANGE LATER to join
+    try {
+      candles[name] = newData;
+    } catch (err) {
+      stateMachineError('addToInstrumentCandles', err);
     }
-    candles[name] = newData;
   };
 
   // custom current candles
@@ -138,5 +144,6 @@
   module.exports = stateMachine;
 })
 (
-  {}
+  {},
+  require('./errorHandlers')
 );

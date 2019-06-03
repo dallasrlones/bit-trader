@@ -1,6 +1,7 @@
-(({ stateMachine, actionMachine, traderMachine, utils }) => {
+(({ stateMachine, actionMachine, utils, errorHandlers }) => {
   const { getState, setState } = stateMachine;
-  const { actionsError, friendlyAlert } = utils;
+  const { friendlyAlert } = utils;
+  const { actionsError } = errorHandlers;
 
   function handleError(err) {
     actionsError('INITIALIZE-INSTRUMENT', err);

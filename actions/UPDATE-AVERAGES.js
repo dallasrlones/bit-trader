@@ -1,6 +1,7 @@
-(({ stateMachine, utils }) => {
+(({ stateMachine, utils, errorHandlers }) => {
   const { getState, setState, getInstrumentCandles, setInstrumentAvgs } = stateMachine;
-  const { actionsError, generateInstrumentAvgs } = utils;
+  const { generateInstrumentAvgs } = utils;
+  const { actionsError } = errorHandlers;
 
   function handleError(err) {
     actionsError('UPDATE-AVERAGES', err);

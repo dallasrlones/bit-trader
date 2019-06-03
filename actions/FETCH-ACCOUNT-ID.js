@@ -1,7 +1,7 @@
-(({ stateMachine, traderMachine, utils }) => {
+(({ stateMachine, traderMachine, errorHandlers }) => {
   const { getState, setState } = stateMachine;
   const { fetchAccountIds } = traderMachine;
-  const { actionsError } = utils;
+  const { actionsError } = errorHandlers;
 
   function handleError(err) {
     actionsError('FETCH-ACCOUNT-ID', err);

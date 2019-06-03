@@ -1,8 +1,9 @@
-((actionMachine, { stateMachine, playSound, utils: { friendlyAlert, alert } }, { instantQueue, fetchQueue }, {  }) => {
+((actionMachine, { stateMachine, soundService, utils: { friendlyAlert, alert } }, { instantQueue, fetchQueue }, {  }) => {
   const { getState } = stateMachine;
-  const { runActionQueue, addToActionQueue, readyToStart } = actionMachine;
+  const { addToActionQueue } = actionMachine;
   const { startInstantQueue } = instantQueue;
   const { startFetchQueue } = fetchQueue;
+  const { addToSoundQueue } = soundService;
 
   const retrySpeed = 1000;
   const fetchQueueIntervalSpeed = 200;
@@ -28,8 +29,8 @@
   // run algo to see if there is a relationship between different instruments and time
   // (at 8:00:01 am EUR went UP and GBP went down) by X amount
 
-  playSound('init.mp3');
-  friendlyAlert(' INITIALIZING ');
+  addToSoundQueue('start.mp3');
+  friendlyAlert(' WAKING UP ');
   addToActionQueue('INSTANT', { name: 'FETCH-ACCOUNT-ID', hasAjax: true });
   startInstantQueue(instantQueueLoopIntervalSpeed);
   start();

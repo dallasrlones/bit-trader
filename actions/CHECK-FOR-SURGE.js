@@ -1,14 +1,15 @@
-(({ actionMachine, stateMachine, traderMachine, utils, playSound, playFloatNumber, playInstrument, playSoundInstant }) => {
+(({ stateMachine, traderMachine, utils, errorHandlers, soundService }) => {
   const { getState, getInstrumentAvgs, addToBuys, checkBuyExists } = stateMachine;
   const { buy } = traderMachine;
-  const { actionsError, algo, friendlyAlert } = utils;
+  const { algo, friendlyAlert } = utils;
+  const { playSound, playFloatNumber, playInstrument, playSoundInstant } = soundService;
+  const { actionsError } = errorHandlers;
 
   function handleError(err) {
     actionsError('CHECK-FOR-SURGE', err);
   }
 
   module.exports = (params, done) => {
-    const { addToActionQueue } = actionMachine;
 
     try {
       const availableInstruments = getState('OANDA-AVAILABLE-INSTRUMENTS');

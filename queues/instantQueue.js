@@ -1,7 +1,8 @@
-((instantQueue, { stateMachine, actionMachine, utils, playSoundInstant }) => {
+((instantQueue, { stateMachine, actionMachine, utils, soundService }) => {
   const { getState, setState } = stateMachine;
   const { runActionQueue, addToActionQueue } = actionMachine;
   const { warning } = utils;
+  const { runSoundQueue, addToSoundQueueTop } = soundService;
 
   let instantQueueLoop = false;
   let tradingOpenPlayed = false;
@@ -25,7 +26,7 @@
         setState('MARKET-IS-OPEN', false);
 
         setTimeout(() => {
-          playSoundInstant('market_closed.mp3');
+          addToSoundQueueTop('market_closed.mp3');
           warning('MARKET IS CLOSED'.red);
         }, 1000 * 30);
       }
@@ -35,7 +36,7 @@
         setState('MARKET-IS-OPEN', true);
 
         setTimeout(() => {
-          playSoundInstant('market_open.mp3');
+          addToSoundQueueTop('market_open.mp3');
         }, 1000 * 30)
       }
     }
@@ -43,6 +44,7 @@
 
   instantQueue.startInstantQueue = (instantQueueLoopIntervalSpeed) => {
     instantQueueLoop = setInterval(() => {
+      runSoundQueue();
       isTradingOpen();
       if (getState('OANDA-ACCOUNT-PRIMARY') !== undefined) {
         addToActionQueue('INSTANT', { name: 'CHECK-FOR-PROFIT-LOSS' });

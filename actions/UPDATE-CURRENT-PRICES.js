@@ -1,7 +1,7 @@
-(({ stateMachine, traderMachine, utils }) => {
+(({ stateMachine, traderMachine, errorHandlers }) => {
   const { getState, setInstrumentPriceAndSpread } = stateMachine;
   const { fetchCurrentPricingForInstruments } = traderMachine;
-  const { actionsError } = utils;
+  const { actionsError } = errorHandlers;
 
   function handleError(err) {
     actionsError('UPDATE-CURRENT-PRICES', err);

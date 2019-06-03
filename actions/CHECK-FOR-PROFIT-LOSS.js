@@ -1,14 +1,14 @@
-(({ actionMachine, stateMachine, traderMachine, utils, playSound }) => {
+(({ actionMachine, stateMachine, traderMachine, errorHandlers, soundService }) => {
   const { getState, setState, checkSetGetHighestProfitLoss, checkBuyExists, addToBuys } = stateMachine;
   const { close } = traderMachine;
-  const { actionsError } = utils;
+  const { actionsError } = errorHandlers;
+  const { addToSoundQueue } = soundService;
 
   function handleError(err) {
     actionsError('CHECK-FOR-PROFIT-LOSS', err);
   }
 
   module.exports = (params, done) => {
-    const { addToActionQueue } = actionMachine;
     try {
 
       // trades: [
@@ -37,7 +37,7 @@
           if (state === 'OPEN') {
 
             if (checkBuyExists(instrument) === false) {
-              playSound('autoDefense.mp3');
+              addToSoundQueue('autoDefense.mp3');
               addToBuys(instrument);
             }
 
@@ -49,7 +49,7 @@
               })
                 .then((closeObj) => {
                   console.log('selling - ' + instrument);
-                  playSound('autoDestruct.mp3');
+                  addToSoundQueue('autoDestruct.mp3');
                 })
                 .catch((err) => {
                   handleError(err);

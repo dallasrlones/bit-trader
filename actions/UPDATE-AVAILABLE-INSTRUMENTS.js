@@ -1,7 +1,7 @@
-(({ stateMachine, traderMachine, utils }) => {
+(({ stateMachine, traderMachine, errorHandlers }) => {
   const { getState, setState } = stateMachine;
   const { fetchAvailableInstruments } = traderMachine;
-  const { actionsError } = utils;
+  const { actionsError } = errorHandlers;
 
   function handleError(err) {
     actionsError('UPDATE-AVAILABLE-INSTRUMENTS', err);
