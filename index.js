@@ -9,6 +9,20 @@
   const fetchQueueIntervalSpeed = 200;
   const instantQueueLoopIntervalSpeed = 50;
 
+  function waitUntilTimeIsEvan() {
+    const now = new Date().getTime().toFixed(0).toString();
+    if (now.endsWith('9') === false) {
+      setTimeout(() => {
+        return waitUntilTimeIsEvan();
+      }, 1);
+    } else {
+      startFetchQueue(fetchQueueIntervalSpeed);
+      setTimeout(() => {
+        addToActionQueue('FETCH', { name: 'UPDATE-CANDLE-DATA' });
+      }, 1000);
+    }
+  }
+
   function start() {
     if (getState('OANDA-ACCOUNT-PRIMARY-ID') === undefined) {
       setTimeout(() => {
@@ -19,10 +33,7 @@
       if (getState('OANDA-AVAILABLE-INSTRUMENTS') === undefined) {
         addToActionQueue('INSTANT', { name: 'UPDATE-AVAILABLE-INSTRUMENTS', hasAjax: true });
         setTimeout(() => {
-          startFetchQueue(fetchQueueIntervalSpeed);
-          setTimeout(() => {
-            addToActionQueue('FETCH', { name: 'UPDATE-CANDLE-DATA' });
-          }, 1000);
+          waitUntilTimeIsEvan();
         }, 2000);
       }
     }

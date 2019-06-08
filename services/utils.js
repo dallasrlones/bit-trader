@@ -336,7 +336,7 @@
         // spreadIsLowerThanAskLowVelocityTimesX(3),
         // currentCustomCandleBidIsAboveAverageAskHighVelocityByX(3)
         //efiAlgo.algoMatch
-        lastXVelocityCandlesWerePositive(2)
+        lastXVelocityCandlesWerePositive(1)
       );
     }
 

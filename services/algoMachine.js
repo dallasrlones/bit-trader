@@ -1,88 +1,136 @@
-((algoMachine, fs, newID) => {
+((algoMachine, {
+  getState,
+  setState,
+  addToStats,
+  getCurrentInstrumentPriceList,
+  getCurrentInstrumentCandles,
+  getCurrentInstrumentPrice,
+  getCurrentStatsObj
+}, { algoMachineError }) => {
 
-  algoMachine.allPossibleAlgos = () => {
-    const allPossibleAlgos = [];
+  algoMachine.genStats = (instrumentName) => {
+    // generate stats on each price update
+    const currentPricingList = Array.from(new Set(getCurrentInstrumentPriceList(instrumentName)));
+    const actualTickPrice = currentPricingList[0];
+    const actualBidPrice = actualTickPrice.closeoutBid;
 
-    let count = 0;
+    const currentCandlesList = getCurrentInstrumentCandles(instrumentName);
 
-    const allPossibleSets = list => {
-      console.log('STARTING POSSIBLE LOOP'.blue);
-        var set = [],
-            listSize = list.length,
-            combinationsCount = (1 << listSize),
-            combination;
+    const statsObj = {
+      efi: false,
+      // (candles: [3, 2, 0]) First candle is positive at 3 pip changes, 2nd candle positive at 2 pip change
+      // zero means it did not change in bid price yet is put into the positve array with 0 pip change
+      timesPositiveFromCurrent: { ticks: [], candles: [] },
+      timesNegativeFromCurrent: { ticks: [], candles: [] },
+      // grabs the velocities from current tick until end of ticks || candles
+      vels: { ticks: [], candles: [] },
+      // grabs the avgs from current tick until end of ticks || candles
+      priceAvgs: { ticks: [], candles: [] },
+      // grabs the pip change avgs from current tick until end of ticks || candles
+      pipAvgs: { ticks: [], candles: [] }
+    };
+    const currentTickPricesSum = 0;
+    const currentCandlePricesSum = 0;
 
-        for (var i = 1; i < combinationsCount ; i++ ){
-            var combination = [];
-            for (var j = 0; j < listSize; j++ ) {
-                if ( (i & (1 << j) ) ) {
-                    combination.push(list[j]);
-                }
+
+    for (var i = 1; i <= currentPricingList.length; i++) {
+      const pricingObj = currentPricingList[parseInt(i) - 1];
+      const currentCloseBid = pricingObj.clouseoutBid;
+
+      const lastPricingObj = currentPricingList[i];
+      const previousCloseBid = lastPricingObj.closeoutBid;
+
+      const currentPricingListSliceToI = currentPricingList.slice(0, parseInt(i));
+
+      // if the current bid price is greater than or equal to the one before current bid price
+      if (currentCloseBid >= previousCloseBid) {
+        statsObj.timesPositiveFromCurrent.ticks.push(parseFloat(currentCloseBid - previousCloseBid));
+      } else {
+      // if the current bid price is less than the one before current bid price
+        statsObj.timesNegativeFromCurrent.ticks.push(parseFloat(previousCloseBid - currentCloseBid));
+      }
+
+      // if the current tick price close bid is greater or equal to the last price close bid
+      statsObj.vels.ticks.push(parseFloat(actualBidPrice - previousCloseBid));
+
+      statsObj.priceAvgs.ticks.push(
+        parseFloat(
+          currentPricingListSliceToI.reduce((results, { closeoutBid }) => {
+            results = parseFloat(results + parseFloat(closeoutBid));
+            return results;
+          }) / parseInt(i)
+        )
+      );
+
+      statsObj.pipAvgs.ticks.push(
+        parseFloat(
+          currentPricingListSliceToI.reduce((results, { closeoutBid }, pipIndex) => {
+            if (pipIndex !== currentPricingListSliceToI.length - 1) {
+              results = parseFloat(results + parseFloat(closeoutBid - currentPricingListSliceToI[parseInt(pipIndex) + 1]));
             }
-            //set.push(combination);
-            // fs.writeFile(`${process.cwd()}/algos/algo-${newID()}.json`, JSON.stringify(combination, null, 2), () => {
-            //
-            // });
-            count += 1;
-        }
-        //return set;
-        console.log(count.toString().yellow);
+            return results;
+          }) / parseInt(i)
+        )
+      );
     }
 
-    // 100 represents x 100 times of change
-    for (var i = 0; i <= 100; i++) {
-      const dynamicOneHrAvgFunc = `({
-        oneHrAvg,
-      }) => {
-        return (oneHrAvg * ${i}) >= currentPrice;
-      }`;
-      allPossibleAlgos.push(dynamicOneHrAvgFunc);
+    for (var i = 0; i <= currentCandlesList.length; i++) {
+      const candleObj = currentCandlesList[i];
 
-      const dynamicThirtyMinAvg = `({
-        thirtyMinAvg,
-      }) => {
-        return (thirtyMinAvg * ${i}) >= currentPrice;
-      }`;
-      allPossibleAlgos.push(dynamicThirtyMinAvg);
 
-      const dynamicFiveMinAvg = `({
-        fiveMinAvg,
-      }) => {
-        return (fiveMinAvg * ${i}) >= currentPrice;
-      }`;
-      allPossibleAlgos.push(dynamicFiveMinAvg);
-
-      const dynamicOneMinAvg = `({
-        oneMinAvg,
-      }) => {
-        return (oneMinAvg * ${i}) >= currentPrice;
-      }`;
-      allPossibleAlgos.push(dynamicOneMinAvg);
-
-      const dynamicThirtySecondAvg = `({
-        thirtySecondAvg,
-      }) => {
-        return (thirtySecondAvg * ${i}) >= currentPrice;
-      }`;
-      allPossibleAlgos.push(dynamicThirtySecondAvg);
-
-      const dynamicLastFiveAvg = `({
-        lastFiveAvg,
-      }) => {
-        return (lastFiveAvg * ${i}) >= currentPrice;
-      }`;
-      allPossibleAlgos.push(dynamicLastFiveAvg);
     }
 
-    console.log('DONE GENERATING 100 PERCENTAGES');
 
-    allPossibleSets(allPossibleAlgos);
+
+
+    addToStats(instrumentName, statsObj);
   };
 
+  algoMachine.runAlgo = instrumentName => {
+    const { spread, closeoutBid } = getCurrentInstrumentPrice(instrumentName);
+    const {
+      efi,
+      timesPositiveFromCurrent,
+      timesNegativeFromCurrent,
+      vels,
+      priceAvgs,
+      pipAvgs
+    } = getCurrentStatsObj(instrumentName);
+
+  // currentCustomCandleIsAboveAverageBidLowVelocityByX
+  // currentCustomCandleIsAboveAverageBidMidVelocityByX
+  // currentCustomCandleIsAboveAverageBidHighVelocityByX
+  // currentCustomCandleIsAboveAverageAskLowVelocityByX
+  // currentCustomCandleIsAboveAverageAskMidVelocityByX
+  // currentCustomCandleIsAboveAverageAskHighVelocityByX
+  // currentCustomCandleBidIsAboveAverageAskHighVelocityByX
+  // currentCustomCandleBidLowIsGraterThanLastAskHighByXTimes
+  // currentCustomCandleSpreadIsLowerThanX
+  // lastXVelocityCandlesWerePositive
+  // lastXVelocityCandleVolumesAreHigherThanLimit
+  // spreadIsLowerThanAskLowVelocityTimesX
+  // eldersForceIndexOverXAmount
+
+    const currentSpreadIsLessThanX = x => (currentSpread <= parseFloat(x));
+
+    const currentPriceIsLessThanOrEqualToLastXTickPriceAvgsTimesY = (x, y) => (currentPrice >= parseFloat(priceAvgs.ticks[x] * y));
+
+    const ticksWerePositiveTheLastXTicks = x => (timesPositiveFromCurrent.ticks.length >= x);
+
+
+    const theQuestion = (
+      currentPriceIsLessThanOrEqualToLastXTickPriceAvgsTimesY(5, 4) &&
+      ticksWerePositiveTheLastXTicks(5) &&
+      currentSpreadIsLessThanX(2)
+    );
+
+    return theQuestion;
+  };
+
+  module.exports = algoMachine;
 })
 (
-  module.exports,
-  require('fs'),
-  require('uuid/v1'),
-  require('colors')
+  { },
+  require('./stateMachine'),
+  require('./errorHandlers')
 );

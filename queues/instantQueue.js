@@ -44,7 +44,6 @@
         addToActionQueue('INSTANT', { name: 'CHECK-FOR-PROFIT-LOSS' });
 
         if (getState('OANDA-HYDRATED')) {
-          addToActionQueue('INSTANT', { name: 'UPDATE-AVERAGES' });
           addToActionQueue('INSTANT', { name: 'CHECK-FOR-SURGE' });
         }
       }

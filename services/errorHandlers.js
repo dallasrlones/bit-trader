@@ -1,4 +1,4 @@
-((errorHandlers, { playSound }, { danger, warning }, actionMachine) => {
+((errorHandlers, { playSound, addToSoundQueueTop, clearSoundQueue }, { danger, warning }, actionMachine) => {
 
   function playError() {
     playSound('error.mp3');
@@ -15,20 +15,23 @@
   errorHandlers.ajaxError = (methodName, err, reject) => {
     playError();
     if (
-      err.errno === 'ECONNRESET' ||
-      err.toString() === 'Error: timeout of 5000ms exceeded'
+      err.code === 'ECONNRESET' ||
+      err.errno === 'ENOTFOUND' ||
+      err.errno === 'ENETUNREACH' ||
+      err.errno === 'EADDRNOTAVAIL' ||
+      err.code === 'ECONNABORTED'
     ) {
-      warning(' INTERNET SHIT THE BED ');
-      playSound('connection_unstable.mp3', undefined, 1500);
-      return reject('');
-    } else if (err.errno === 'ENOTFOUND' || err.errno === 'ENETUNREACH' || err.errno === 'EADDRNOTAVAIL') {
-      danger(' CONNECTION LOST ');
+      danger(` CONNECTION LOST - ${(' ' + methodName + ' ').bgWhite.red}`);
       const { setState, clearCustomCandles } = require('./stateMachine');
       setState('ONLINE', false);
       clearCustomCandles();
-      setTimeout(() => {
-        playSound('cant_find_source.mp3', undefined, 2500);
-      }, 1000);
+
+      addToSoundQueueTop('alarm.mp3', () => {
+        addToSoundQueueTop('cant_find_source.mp3', () => {
+          addToSoundQueueTop('EXIT');
+        });
+      });
+
       return reject('');
     }
 

@@ -1,6 +1,11 @@
-((soundService, player, { soundServiceError }) => {
+((soundService, player) => {
 
   let canPlaySound = true;
+
+  function soundServiceError(methodName, err) {
+    console.log(methodName);
+    console.log(err);
+  }
 
   soundService.playSound = (locationInRoot, cb, intervalToWait) => {
     try {
@@ -59,7 +64,7 @@
     }
   };
 
-  const soundQueue = [];
+  let soundQueue = [];
   let soundQueueIsPlaying = false;
 
   function play(name, cb) {
@@ -87,6 +92,10 @@
           const [name, cb] = soundQueue[0];
           play(name, cb);
         } else {
+          if (soundQueue[0] === 'EXIT') {
+            soundQueue = [];
+            return;
+          }
           play(soundQueue[0]);
         }
 
@@ -102,6 +111,5 @@
 })
 (
   {},
-  require('play-sound')(opts = {}),
-  require('./errorHandlers')
+  require('play-sound')(opts = {})
 );

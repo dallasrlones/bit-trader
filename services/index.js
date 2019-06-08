@@ -6,6 +6,7 @@
   services.utils = require('./utils');
   services.soundService = require('./soundService');
   services.errorHandlers = require('./errorHandlers');
+  services.algoMachine = require('./algoMachine');
 
   module.exports = services;
 

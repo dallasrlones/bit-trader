@@ -6,6 +6,7 @@
   let buys = {};
   let profitLosses = {};
   let mostRecentPrices = {};
+  let isntrumentStats = {};
   let turningOnline = false;
 
   function checkOnline(stateName, value) {
@@ -25,9 +26,7 @@
     state[stateName] = value;
   };
 
-  stateMachine.getState = (stateName) => {
-    return state[stateName];
-  };
+  stateMachine.getState = (stateName) => state[stateName];
 
   stateMachine.checkSetGetHighestProfitLoss = (id, newProfitLossValue) => {
     try {
@@ -87,31 +86,26 @@
         if (mostRecentPrices[instrument].length === fullCandleLength && candles[instrument] !== undefined) {
           const currentPrices = mostRecentPrices[instrument];
 
-          const customCandle = currentPrices.reduce((results, currentPriceObj) => {
+          const customCandle = Array.from(new Set(currentPrices)).reduce((results, currentPriceObj) => {
             const newResults = { ...results };
 
             if (parseFloat(newResults.bid.h) < parseFloat(currentPriceObj.closeoutBid)) {
-              console.log('hit 1');
               newResults.bid.h = currentPriceObj.closeoutBid;
             }
 
             if (parseFloat(newResults.bid.l) > parseFloat(currentPriceObj.closeoutBid)) {
-              console.log('hit 2');
               newResults.bid.l = currentPriceObj.closeoutBid;
             }
 
             if (parseFloat(newResults.ask.h) < parseFloat(currentPriceObj.closeoutAsk)) {
-              console.log('hit 3');
               newResults.ask.h = currentPriceObj.closeoutAsk;
             }
 
             if (parseFloat(newResults.ask.l) > parseFloat(currentPriceObj.closeoutAsk)) {
-              console.log('hit 4');
               newResults.ask.l = currentPriceObj.closeoutAsk;
             }
 
             if (currentPriceObj.closeoutBid !== closeoutBid){
-              console.log('hit 5');
               newResults.volume += 1;
             }
 
@@ -124,10 +118,7 @@
             ask: { o: currentPrices[fullCandleLength -1].closeoutAsk, h: currentPrices[fullCandleLength -1].closeoutAsk, l: currentPrices[fullCandleLength -1].closeoutAsk, c: currentPrices[0].closeoutAsk }
           });
 
-          console.log(customCandle);
 
-          console.log(candles[instrument][candles[instrument].length - 1]);
-          process.exit(1)
 
           candles[instrument].unshift(customCandle);
           candles[instrument].pop();
@@ -141,9 +132,9 @@
     }
   };
 
-  stateMachine.getInstrumentPrice = name => {
-    return prices[name];
-  };
+  stateMachine.getCurrentInstrumentPrice = name => prices[name];
+
+  stateMachine.getCurrentInstrumentPriceList = name => mostRecentPrices[name].sort((a,b) => (a.time > b.time));
 
   stateMachine.addToInstrumentCandles = (name, newData) => {
     // CHANGE LATER to join for larger sets
@@ -154,17 +145,28 @@
     }
   };
 
-  stateMachine.getInstrumentCandles = name => {
-    return candles[name];
-  };
+  stateMachine.getCurrentInstrumentCandles = name => candles[name];
 
   stateMachine.setInstrumentAvgs = (name, avgsObj) => {
     avgs[name] = avgsObj;
   };
 
-  stateMachine.getInstrumentAvgs = name => {
-    return avgs[name];
+  stateMachine.getInstrumentAvgs = name => avgs[name];
+
+  stateMachine.setStats = (name, statsObj) => instrumentStats[name] = statsObj;
+
+  stateMachine.addToStats = (name, statsObj) => {
+    if (instrumentStats[name] === undefined) {
+      instrumentStats[name] = [];
+    }
+
+    instrumentStats[name].unshift(statsObj);
+    if (instrumentStats[name].length > (5 * 5)) {
+      instrumentStats.pop();
+    }
   };
+
+  stateMachine.getCurrentStatsObj = name => isntrumentStats[name];
 
   module.exports = stateMachine;
 })
