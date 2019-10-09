@@ -1,7 +1,7 @@
 ((actionMachine, actions, newID, { actionMachineError }) => {
   let actionQueue = {};
   let readyToStart = false;
-  const maxCallCount = 100;
+  const maxCallCount = 50;
   let callCount = [];
 
   function hasCallsAvailable() {
@@ -76,6 +76,7 @@
   actionMachine.runAction = (queueName, actionObj) => {
     try {
       const { name, params, isRunning, id, hasAjax } = actionObj;
+
       if (isRunning === false) {
         if (actions[name] !== undefined) {
           actionMachine.updateActionInQueue(queueName, id, { isRunning: true });

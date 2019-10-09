@@ -4,31 +4,25 @@
   const { friendlyAlert } = utils;
   const { actionsError } = errorHandlers;
 
+  module.exports = ({ name, fromDate, itteration, limit }, done, retry) => {
+    function handleError(err) {
+      actionsError('INITIALIZE-INSTRUMENT-SHARD', err);
+      // REMOVE
+      process.exit(1337);
+      retry();
+    }
 
-  function handleError(err) {
-    actionsError('INITIALIZE-INSTRUMENT-SHARD', err);
-  }
-
-  module.exports = ({ name, fromDate, limit }, done, retry) => {
     const { addToActionQueue } = actionMachine;
 
     try {
       fetchTickDataFrom('OANDA', name, fromDate, limit || 5000)
         .then((candlesArray) => {
-          setState(`INITIALIZING-${name}-COUNT`, (getState(`INITIALIZING-${name}-COUNT`) - 1));
-
           if (candlesArray.length !== limit) {
             handleError('response candles array not the requested limit length');
-            console.log(fromDate);
-            console.log(name);
-            console.log(limit);
-            console.log(candlesArray.length);
-            console.log(candlesArray);
-            process.exit(1)
-            retry();
           }
 
-          addToInstrumentCandles(name, candlesArray);
+          addToInstrumentCandles(name, itteration, candlesArray);
+          setState(`INITIALIZING-${name}-COUNT`, (getState(`INITIALIZING-${name}-COUNT`) - 1));
 
           if (getState(`INITIALIZING-${name}-COUNT`) === 0) {
             addToActionQueue('INSTANT', { name: 'CHECK-INITIALIZED', params: { name } });
@@ -39,7 +33,6 @@
         .catch((err) => {
           setState(`INITIALIZING-${name}-COUNT`, (getState(`INITIALIZING-${name}-COUNT`) + 1));
           handleError(err);
-          retry();
         });
 
     } catch (err) {

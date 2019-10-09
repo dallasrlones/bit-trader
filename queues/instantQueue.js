@@ -4,23 +4,25 @@
   const { warning } = utils;
   const { runSoundQueue, addToSoundQueueTop } = soundService;
 
+  const timeZone = 'America/New_York';
   let instantQueueLoop = false;
   let tradingOpenPlayed = false;
 
-  function dayIs(dayNum) {
-    return (new Date(
-      new Date().toLocaleString("en-US", {timeZone: "America/New_York"})
-    ).getDay() === dayNum)
-  }
-
   function timePassedClose(){
     return (new Date(
-      new Date().toLocaleString("en-US", {timeZone: "America/New_York"})
+      new Date().toLocaleString("en-US", { timeZone })
     ).getHours() >= 17);
   }
 
   function isTradingOpen() {
-    if ((dayIs(0) || (dayIs(5) ) || dayIs(6)) && timePassedClose() === false) {
+    const rightNow = new Date(
+      new Date().toLocaleString("en-US", { timeZone })
+    );
+
+    const theDay = rightNow.getDay();
+    const theHours = rightNow.getHours();
+
+    if ((theDay == 5 && theHours >= 17) || theDay == 6 || (theDay == 7 && theHours <= 16)) {
       if(tradingOpenPlayed === false) {
         tradingOpenPlayed = true;
         setState('MARKET-IS-OPEN', false);

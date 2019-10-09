@@ -60,10 +60,15 @@
 
   errorHandlers.utilsError = (methodName, err) => {
     playError();
-    console.log(` services/${'utils.js'.cyan} - ${methodName} - ${err.toString().red}`);
+    console.log(` services/${'utils.js'.yellow} - ${methodName} - ${err.toString().red}`);
     console.log(err);
   };
 
+  errorHandlers.algoMachineError = (methodName, err) => {
+    playError();
+    console.log(` services/${'algoMachine.js'.cyan} - ${methodName} - ${err.toString().red}`);
+    console.log(err);
+  };
 
   module.exports = errorHandlers;
 })

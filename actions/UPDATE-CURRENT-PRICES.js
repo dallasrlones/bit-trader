@@ -1,13 +1,15 @@
-(({ stateMachine, traderMachine, errorHandlers }) => {
+(({ stateMachine, traderMachine, errorHandlers, algoMachine }) => {
   const { getState, setInstrumentPriceAndSpread } = stateMachine;
+  const { genStats } = algoMachine;
   const { fetchCurrentPricingForInstruments } = traderMachine;
   const { actionsError } = errorHandlers;
 
-  function handleError(err) {
-    actionsError('UPDATE-CURRENT-PRICES', err);
-  }
-
   module.exports = (params, done, retry) => {
+    function handleError(err) {
+      actionsError('UPDATE-CURRENT-PRICES', err);
+      retry();
+    }
+
     try {
 
       // find the most recent candle from candles array
@@ -16,26 +18,31 @@
       // create an array of prices
       // grab the last 5 seconds back and create a candle
       // filter out the ones that are longer than 5 seconds
-      const instrumentsArray = getState('OANDA-AVAILABLE-INSTRUMENTS').map(({ name }) => (name));
+      let instrumentsArray = (getState('OANDA-AVAILABLE-INSTRUMENTS') || [])
+      instrumentsArray = instrumentsArray.map(({ name }) => (name));
+
+      if (instrumentsArray.length < 1) {
+        return;
+      }
+
       fetchCurrentPricingForInstruments(
         'OANDA',
         getState('OANDA-ACCOUNT-PRIMARY-ID'),
         instrumentsArray
       )
-        .then((pricingArray) => {
-          pricingArray.forEach((pricingObj) => {
-            setInstrumentPriceAndSpread(pricingObj);
-          });
-          done();
-        })
-        .catch((err) => {
-          handleError(err);
-          retry();
+      .then((pricingArray) => {
+        pricingArray.forEach((pricingObj) => {
+          setInstrumentPriceAndSpread(pricingObj);
+          genStats(pricingObj.instrument);
         });
+        done();
+      })
+      .catch((err) => {
+        handleError(err);
+      });
 
     } catch (err) {
       handleError(err);
-      retry();
     }
 
   };

@@ -6,22 +6,26 @@
   const { actionsError } = errorHandlers;
   const { runAlgo } = algoMachine;
 
-  function handleError(err) {
-    actionsError('CHECK-FOR-SURGE', err);
-  }
+  module.exports = (params, done, retry) => {
 
-  module.exports = (params, done) => {
+    function handleError(err) {
+      actionsError('CHECK-FOR-SURGE', err);
+      retry();
+    }
 
     try {
-      if (getState('MARKET-IS-OPEN') === false) {
-        return;
-      }
+      // if (getState('MARKET-IS-OPEN') === false) {
+      //   return;
+      // }
 
       const availableInstruments = getState('OANDA-AVAILABLE-INSTRUMENTS');
       availableInstruments.forEach(({ name }) => {
 
         if (checkBuyExists(name) === false) {
-          if (runAlgo(name) === true) {
+          const { hit, efi } = runAlgo(name);
+          if (hit === true) {
+            console.log(' I WAS HIT MOTHA LICKA ');
+            process.exit(1);
             console.log('BUYING - ' + name);
             playSoundInstant('opentrade.mp3', () => {
               playInstrument(name, () => {
@@ -33,20 +37,20 @@
               });
 
             });
-            addToBuys(name)
-            buy('OANDA', {
-              accountId: getState('OANDA-ACCOUNT-PRIMARY-ID'),
-              currencyPair: name,
-              amount: 100
-            })
-              .then((order) => {
-                // remove from buys on close
-                return done();
-              })
-              .catch((err) => {
-                handleError(err);
-                retry();
-              });
+            // addToBuys(name)
+            // buy('OANDA', {
+            //   accountId: getState('OANDA-ACCOUNT-PRIMARY-ID'),
+            //   currencyPair: name,
+            //   // MAKE DYNAMIC
+            //   amount: 100
+            // })
+            // .then((order) => {
+            //   // remove from buys on close
+            //   return done();
+            // })
+            // .catch((err) => {
+            //   handleError(err);
+            // });
           }
         }
 

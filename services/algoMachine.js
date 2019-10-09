@@ -8,86 +8,111 @@
   getCurrentStatsObj
 }, { algoMachineError }) => {
 
-  algoMachine.genStats = (instrumentName) => {
+  function getDifference(num1, num2) {
+    num1 = parseFloat(num1);
+    num2 = parseFloat(num2);
+    return parseFloat((num1 > num2) ? num1 - num2 : num2 - num1);
+  }
+
+  algoMachine.genStats = instrumentName => {
     // generate stats on each price update
-    const currentPricingList = Array.from(new Set(getCurrentInstrumentPriceList(instrumentName)));
-    const actualTickPrice = currentPricingList[0];
-    const actualBidPrice = actualTickPrice.closeoutBid;
+    try {
+      const currentPricingList = Array.from(new Set(getCurrentInstrumentPriceList(instrumentName)));
+      const currentCandlesList = getCurrentInstrumentCandles(instrumentName);
 
-    const currentCandlesList = getCurrentInstrumentCandles(instrumentName);
-
-    const statsObj = {
-      efi: false,
-      // (candles: [3, 2, 0]) First candle is positive at 3 pip changes, 2nd candle positive at 2 pip change
-      // zero means it did not change in bid price yet is put into the positve array with 0 pip change
-      timesPositiveFromCurrent: { ticks: [], candles: [] },
-      timesNegativeFromCurrent: { ticks: [], candles: [] },
-      // grabs the velocities from current tick until end of ticks || candles
-      vels: { ticks: [], candles: [] },
-      // grabs the avgs from current tick until end of ticks || candles
-      priceAvgs: { ticks: [], candles: [] },
-      // grabs the pip change avgs from current tick until end of ticks || candles
-      pipAvgs: { ticks: [], candles: [] }
-    };
-    const currentTickPricesSum = 0;
-    const currentCandlePricesSum = 0;
-
-
-    for (var i = 1; i <= currentPricingList.length; i++) {
-      const pricingObj = currentPricingList[parseInt(i) - 1];
-      const currentCloseBid = pricingObj.clouseoutBid;
-
-      const lastPricingObj = currentPricingList[i];
-      const previousCloseBid = lastPricingObj.closeoutBid;
-
-      const currentPricingListSliceToI = currentPricingList.slice(0, parseInt(i));
-
-      // if the current bid price is greater than or equal to the one before current bid price
-      if (currentCloseBid >= previousCloseBid) {
-        statsObj.timesPositiveFromCurrent.ticks.push(parseFloat(currentCloseBid - previousCloseBid));
-      } else {
-      // if the current bid price is less than the one before current bid price
-        statsObj.timesNegativeFromCurrent.ticks.push(parseFloat(previousCloseBid - currentCloseBid));
+      if (currentPricingList.length < (5 * 5) - 1) {
+        return;
       }
 
-      // if the current tick price close bid is greater or equal to the last price close bid
-      statsObj.vels.ticks.push(parseFloat(actualBidPrice - previousCloseBid));
+      const actualCurrentPriceObj = currentPricingList[0];
+      const actualCurrentCandleObj = currentCandlesList[0];
 
-      statsObj.priceAvgs.ticks.push(
-        parseFloat(
-          currentPricingListSliceToI.reduce((results, { closeoutBid }) => {
-            results = parseFloat(results + parseFloat(closeoutBid));
-            return results;
-          }) / parseInt(i)
-        )
-      );
+      const statsObj = {
+        efi: false,
+        // ticks / candles: [3, 2, 0]) First candle is positive at 3 pip changes,
+        // 2nd candle positive at 2 pip change
+        // zero means it did not change in bid price yet is put into the positve array with 0 pip change
+        timesPositiveFromCurrent: { ticks: [], candles: [] },
+        // timesNegativeFromCurrent: { ticks: [], candles: [] },
+        // grabs the velocities from current tick until end of ticks || candles
+        vels: { ticks: [], candles: [] },
+        // grabs the avgs from current tick until end of ticks || candles
+        priceAvgs: { ticks: [], candles: [] },
+        // grabs the pip change avgs from current tick until end of ticks || candles
+        pipAvgs: { ticks: [], candles: [] }
+      };
 
-      statsObj.pipAvgs.ticks.push(
-        parseFloat(
-          currentPricingListSliceToI.reduce((results, { closeoutBid }, pipIndex) => {
-            if (pipIndex !== currentPricingListSliceToI.length - 1) {
-              results = parseFloat(results + parseFloat(closeoutBid - currentPricingListSliceToI[parseInt(pipIndex) + 1]));
-            }
-            return results;
-          }) / parseInt(i)
-        )
-      );
+      // loop through ticks [0-24]
+      for (var i = 0; i < currentPricingList.length; i++) {
+        if (i + 1 != currentPricingList.length) {
+
+          const closeoutBid = parseFloat(currentPricingList[i].closeoutBid);
+          const prevCloseoutBid = parseFloat(currentPricingList[i + 1].closeoutBid);
+
+          console.log(getCurrentInstrumentPriceList(instrumentName));
+          console.log(closeoutBid);
+          console.log(prevCloseoutBid);
+          process.exit(1338)
+
+          // statsObj.timesPositiveFromCurrent.ticks
+          if (parseFloat(currentPricingList[i].closeoutBid) >= parseFloat(currentPricingList[i + 1].closeoutBid)) {
+            statsObj.timesPositiveFromCurrent.ticks.push(
+              getDifference(currentPricingList[i].closeoutBid, currentPricingList[i + 1].closeoutBid)
+            );
+            console.log(statsObj.timesPositiveFromCurrent.ticks);
+          }
+
+          // statsObj.vels.ticks
+          statsObj.vels.ticks.push(
+            getDifference(
+              currentPricingList[0].closeoutBid,
+              currentPricingList[i + 1].closeoutBid
+            )
+          );
+
+          // statsObj.priceAvgs.ticks
+          statsObj.priceAvgs.ticks.push(
+            parseFloat(currentPricingList.slice(0, i + 1).reduce((a, b) => {
+              return parseFloat(a.closeoutBid) + parseFloat(b.closeoutBid)
+            }, 0) / (i + 1))
+          );
+
+          // statsObj.pipAvgs.ticks
+          statsObj.pipAvgs.ticks.push(
+            parseFloat(
+              currentPricingList.slice(0, i + 1).reduce((a, b) => {
+                return getDifference(parseFloat(a.closeoutBid), parseFloat(b.closeoutBid))
+              }, 0) / (i + 1)
+            )
+          );
+
+        }
+      }
+
+      console.log(currentPricingList.length);
+      console.log(statsObj);
+      process.exit(1337)
+
+      // loop through candles [0 - 180]
+      for (var i = 0; i <= currentCandlesList.length; i++) {
+
+      }
+
+
+      addToStats(instrumentName, statsObj);
+    } catch (err) {
+      algoMachineError('genStats', err);
     }
-
-    for (var i = 0; i <= currentCandlesList.length; i++) {
-      const candleObj = currentCandlesList[i];
-
-
-    }
-
-
-
-
-    addToStats(instrumentName, statsObj);
   };
 
   algoMachine.runAlgo = instrumentName => {
     const { spread, closeoutBid } = getCurrentInstrumentPrice(instrumentName);
+    const statsObj = getCurrentStatsObj(instrumentName);
+
+    if (statsObj === undefined) {
+      return { hit: false };
+    }
+
     const {
       efi,
       timesPositiveFromCurrent,
@@ -95,7 +120,7 @@
       vels,
       priceAvgs,
       pipAvgs
-    } = getCurrentStatsObj(instrumentName);
+    } = statsObj;
 
   // currentCustomCandleIsAboveAverageBidLowVelocityByX
   // currentCustomCandleIsAboveAverageBidMidVelocityByX
@@ -119,12 +144,12 @@
 
 
     const theQuestion = (
-      currentPriceIsLessThanOrEqualToLastXTickPriceAvgsTimesY(5, 4) &&
-      ticksWerePositiveTheLastXTicks(5) &&
+      currentPriceIsLessThanOrEqualToLastXTickPriceAvgsTimesY(5, 2) &&
+      ticksWerePositiveTheLastXTicks(3) &&
       currentSpreadIsLessThanX(2)
     );
 
-    return theQuestion;
+    return { hit: theQuestion, efi };
   };
 
   module.exports = algoMachine;

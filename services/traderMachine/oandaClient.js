@@ -2,7 +2,7 @@
   const alignmentTimezone = 'America/Denver';
   const client = axios.create({
     baseURL: `${baseOandaUrl}/v3`,
-    timeout: 1000 * 5,
+    timeout: 1000 * 15,
     headers: {
       'Authorization': oandaAuthHeader,
       'Content-Type': 'application/json',

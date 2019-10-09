@@ -8,6 +8,7 @@
   let mostRecentPrices = {};
   let isntrumentStats = {};
   let turningOnline = false;
+  let currentTick = 0;
 
   function checkOnline(stateName, value) {
     if (stateName === 'ONLINE' && value === true && state['ONLINE'] === false && turningOnline === false) {
@@ -27,6 +28,12 @@
   };
 
   stateMachine.getState = (stateName) => state[stateName];
+
+  stateMachine.setCurrentTick = tick => {
+    currentTick = tick;
+  };
+
+  stateMachine.getCurrentTick = () => (currentTick);
 
   stateMachine.checkSetGetHighestProfitLoss = (id, newProfitLossValue) => {
     try {
@@ -63,28 +70,35 @@
   };
 
   stateMachine.getLatestCustomCandleOpenTime = (name) => {
-    if (mostRecentPrices[name] === undefined) {
+    if (mostRecentPrices[name + currentTick] === undefined) {
       return false;
     }
-    return mostRecentPrices[name][mostRecentPrices[name].length - 1].time || false;
+    return mostRecentPrices[name + currentTick][mostRecentPrices[name + currentTick].length - 1].time || false;
   };
 
-  stateMachine.setInstrumentPriceAndSpread = (pricingObj) => {
+  stateMachine.setInstrumentPriceAndSpread = pricingObj => {
+    // setting the current price
+    // setting the current spread
+    // setting the current candles
+
+
     try {
       const { closeoutAsk, closeoutBid, instrument, time } = pricingObj;
       const spread = parseFloat((closeoutAsk - closeoutBid) / closeoutAsk * 100).toFixed(3);
 
-      if(mostRecentPrices[instrument] === undefined) {
-        mostRecentPrices[instrument] = [pricingObj];
+      const currentTickInstrument = instrument + currentTick;
+
+      if(mostRecentPrices[currentTickInstrument] === undefined) {
+        mostRecentPrices[currentTickInstrument] = [pricingObj];
       } else {
-        mostRecentPrices[instrument].unshift(pricingObj);
+        mostRecentPrices[currentTickInstrument].unshift(pricingObj);
 
         const fullCandleLength = 5 * 5;
         // 5 second candles (5 fetch loops in 1 second * 5)
-        const lastCandlesCloseBid = mostRecentPrices[instrument].closeoutBid;
+        const lastCandlesCloseBid = mostRecentPrices[currentTickInstrument].closeoutBid;
 
-        if (mostRecentPrices[instrument].length === fullCandleLength && candles[instrument] !== undefined) {
-          const currentPrices = mostRecentPrices[instrument];
+        if (mostRecentPrices[currentTickInstrument].length === fullCandleLength && candles[currentTickInstrument] !== undefined) {
+          const currentPrices = mostRecentPrices[currentTickInstrument];
 
           const customCandle = Array.from(new Set(currentPrices)).reduce((results, currentPriceObj) => {
             const newResults = { ...results };
@@ -120,32 +134,33 @@
 
 
 
-          candles[instrument].unshift(customCandle);
-          candles[instrument].pop();
-          mostRecentPrices[instrument] = [];
+          candles[currentTickInstrument].unshift(customCandle);
+          candles[currentTickInstrument].pop();
+          mostRecentPrices[currentTickInstrument] = [];
         }
       }
 
+      // this set's the most recent up to date price
       prices[instrument] = { ...pricingObj, spread };
     } catch (err) {
       stateMachineError('setInstrumentPriceAndSpread', err);
     }
   };
 
-  stateMachine.getCurrentInstrumentPrice = name => prices[name];
+  stateMachine.getCurrentInstrumentPrice = instrument => prices[instrument];
 
-  stateMachine.getCurrentInstrumentPriceList = name => mostRecentPrices[name].sort((a,b) => (a.time > b.time));
+  stateMachine.getCurrentInstrumentPriceList = name => mostRecentPrices[name + currentTick].sort((a,b) => (a.time > b.time));
 
-  stateMachine.addToInstrumentCandles = (name, newData) => {
+  stateMachine.addToInstrumentCandles = (name, itteration, newCandleData) => {
     // CHANGE LATER to join for larger sets
     try {
-      candles[name] = newData;
+      candles[name + itteration] = newCandleData;
     } catch (err) {
       stateMachineError('addToInstrumentCandles', err);
     }
   };
 
-  stateMachine.getCurrentInstrumentCandles = name => candles[name];
+  stateMachine.getCurrentInstrumentCandles = name => candles[name + currentTick];
 
   stateMachine.setInstrumentAvgs = (name, avgsObj) => {
     avgs[name] = avgsObj;
